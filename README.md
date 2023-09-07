@@ -1,6 +1,6 @@
 # Project Solanum
 
-This is a work in progress project to generate configurable solar systems adding planets and it's satellites to create orbits.
+This is a work in progress project to generate configurable solar systems adding planets and their satellites to create orbits.
 
 ## Available Scripts
 
