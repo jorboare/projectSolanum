@@ -17,11 +17,18 @@ interface Satellite {
 interface ContainerProps {
   show: boolean;
 }
+interface SatContainerProps {
+  show: boolean;
+  visible: boolean;
+}
 
 const Container = styled.div<ContainerProps>`
   height: 150px;
-  width: 95%;
-  background-color: rgba(255, 255, 255, 0.5);
+  width: 90%;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
   border-radius: 20px;
   position: absolute;
   bottom: 0;
@@ -32,6 +39,32 @@ const Container = styled.div<ContainerProps>`
   justify-content: space-evenly;
   opacity: ${(props) => (props.show ? "1" : "0")};
   transition: all 1s ease;
+  margin: 0 5% 20px 5%;
+`;
+const SatContainer = styled.div<SatContainerProps>`
+  height: ${(props) => (props.visible ? "100px" : "0px")};
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
+  border-radius: 20px;
+  position: absolute;
+  bottom: 160px;
+  left: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  opacity: ${(props) => (props.show ? "1" : "0")};
+  transition: all 0.3s ease;
+  margin: 0 5% 20px 5%;
+  padding: ${(props) => (props.visible ? "10px 0px 10px 10px" : "0px")};
+  & > * {
+    margin-right: 10px;
+    height: ${(props) => (props.visible ? "30px" : "0px")};
+    width: ${(props) => (props.visible ? "30px" : "0px")};
+  }
 `;
 
 const PlanetsList: React.FC = () => {
@@ -42,6 +75,16 @@ const PlanetsList: React.FC = () => {
     handleOrbits,
     setMouseInactive,
     mouseInactive,
+    deletePlanets,
+    deselectPlanet,
+    selectedPlanets,
+    addSatellites,
+    setAddSatellites,
+    hightContrast,
+    setHightContrast,
+    setDemo,
+    setFollowedPlanet,
+    followedPlanet,
   } = useAppContext();
   const [fullScreen, setFullScreen] = useState(false);
   const handleClick = (id: string) => {
@@ -49,34 +92,26 @@ const PlanetsList: React.FC = () => {
   };
   //@ts-ignore
   let mouseTimer: NodeJS.Timeout | null = null;
-
+  4;
+  const [showSatellites, setShowSatellites] = useState(false);
   const handleMouseMove = () => {
-    console.log("Fullscreen----->", fullScreen);
-
     setMouseInactive(false);
     if (mouseTimer) {
       clearTimeout(mouseTimer);
     }
 
-    // Establecer un temporizador para marcar como inactivo después de 3 segundos
     mouseTimer = setTimeout(() => {
       setMouseInactive(true);
-      // Aquí puedes ejecutar el código que deseas cuando el ratón está inactivo
-      console.log("El ratón está inactivo durante 3 segundos");
-    }, 5000); // 3000 milisegundos (3 segundos)
+    }, 5000);
   };
 
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      // Limpieza cuando el componente se desmonta
-      window.removeEventListener("mousemove", handleMouseMove);
-      if (mouseTimer) {
-        clearTimeout(mouseTimer);
-      }
-    };
   }, []);
+
+  useEffect(() => {
+    setShowSatellites(selectedPlanets.length === 1);
+  }, [selectedPlanets]);
 
   const handleReset = () => {
     cleanState();
@@ -84,7 +119,7 @@ const PlanetsList: React.FC = () => {
   const showOrbits = () => {
     handleOrbits();
   };
-
+  //@ts-ignore
   const handleFullScreen = () => {
     if (
       document.fullscreenElement ||
@@ -116,25 +151,80 @@ const PlanetsList: React.FC = () => {
     }
   };
 
+  const unSelectPlanets = () => {
+    setShowSatellites(false);
+    setTimeout(() => {
+      deselectPlanet();
+    }, 300);
+  };
+
   return (
-    <Container show={!mouseInactive}>
-      {state.planets
-        ? state.planets.map((p) => (
-            <PlanetGenerator
-              key={p.id}
-              color={p.color}
-              onClick={() => handleClick(p.id)}
-              selected={p.selected}
-              id={p.id}
-            />
-          ))
-        : null}
-      <button onClick={handleReset}>Reset</button>
-      <button onClick={showOrbits}>Orbits</button>
-      <button id="fullscreen-button" onClick={handleFullScreen}>
-        {fullScreen ? "Close" : "Full screen"}
-      </button>
-    </Container>
+    <>
+      <SatContainer show={!mouseInactive} visible={showSatellites}>
+        {state.planets.map((p) => {
+          if (selectedPlanets[0] === p.id) {
+            if (p.satellites.length)
+              return p.satellites.map((s) => (
+                <PlanetGenerator
+                  key={s.id}
+                  color={s.color}
+                  onClick={() => handleClick(s.id)}
+                  id={s.id}
+                />
+              ));
+          }
+        })}
+        <button onClick={() => setShowSatellites(false)}>Hide</button>
+      </SatContainer>
+      <Container show={!mouseInactive}>
+        {state.planets
+          ? state.planets.map((p) => (
+              <PlanetGenerator
+                key={p.id}
+                color={p.color}
+                onClick={() => handleClick(p.id)}
+                id={p.id}
+              />
+            ))
+          : null}
+        {selectedPlanets.length === 1 && (
+          <button onClick={() => setAddSatellites(!addSatellites)}>
+            Add satellites
+          </button>
+        )}
+        {selectedPlanets.length === 1 && (
+          <button
+            onClick={() => {
+              if (followedPlanet) {
+                setFollowedPlanet(null);
+              } else setFollowedPlanet(selectedPlanets[0]);
+              console.log("followedPlanet ---->", followedPlanet);
+            }}
+          >
+            Follow
+          </button>
+        )}
+        <button onClick={unSelectPlanets}>Unselect</button>
+        <button
+          onClick={() => {
+            setShowSatellites(false);
+            deletePlanets();
+          }}
+        >
+          Delete Selected Planets
+        </button>
+        <button onClick={handleReset}>Reset</button>
+        <button onClick={showOrbits}>Orbits</button>
+        <button onClick={() => setHightContrast(!hightContrast)}>
+          Hight Contrast
+        </button>
+        <button onClick={setDemo}>Demo</button>
+
+        <button id="fullscreen-button" onClick={handleFullScreen}>
+          {fullScreen ? "Close" : "Full screen"}
+        </button>
+      </Container>
+    </>
   );
 };
 

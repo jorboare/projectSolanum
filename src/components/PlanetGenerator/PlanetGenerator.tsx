@@ -17,50 +17,51 @@ const Planet = styled.div<PlanetProps>`
     props.selected ? `5px solid white` : "0px solid white"};
   transform: ${(props) => (props.selected ? `scale(1.2)` : "")};
   transition: all 0.5s ease;
+  position: relative;
 `;
 
 interface PlanetGeneratorProps {
   color: string;
   size?: number;
   onClick: () => void;
-  selected: boolean;
   id: string;
 }
 
 const PlanetGenerator: React.FC<PlanetGeneratorProps> = ({
   color,
   size,
-  selected,
   onClick,
   id,
 }) => {
   const planetRef = useRef<HTMLDivElement | null>(null);
 
-  const { deselectPlanet, selectedPlanet } = useAppContext();
+  const { selectedPlanets } = useAppContext();
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        planetRef.current &&
-        !planetRef.current.contains(event.target as Node)
-      ) {
-        deselectPlanet();
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (
+  //       (planetRef.current &&
+  //         !planetRef.current.contains(event.target as Node)) ||
+  //       (deletePlanetRef.current &&
+  //         !deletePlanetRef.current.contains(event.target as Node))
+  //     ) {
+  //       deselectPlanet();
+  //     }
+  //   };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
   return (
     <Planet
       ref={planetRef}
       color={color}
       size={size}
-      selected={selectedPlanet === id}
+      selected={selectedPlanets.some((p) => p === id)}
       onClick={onClick}
-    />
+    ></Planet>
   );
 };
 

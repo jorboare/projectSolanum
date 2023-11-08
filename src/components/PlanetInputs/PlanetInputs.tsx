@@ -20,10 +20,15 @@ interface Planet {
 }
 
 interface Satellite {
-  radius: number;
+  id: string;
+  orbitRadius: number;
+  planetRadius: number;
   distance: number;
   color: string;
   pattern: string;
+  speed: number;
+  initialAngle: number;
+  selected: boolean;
 }
 
 interface ContainerProps {
@@ -31,7 +36,6 @@ interface ContainerProps {
 }
 
 const Container = styled.div<ContainerProps>`
-  background-color: rgba(255, 255, 255, 0.5);
   border-radius: 20px;
   position: absolute;
   top: 20px;
@@ -40,6 +44,11 @@ const Container = styled.div<ContainerProps>`
   padding: 20px;
   opacity: ${(props) => (props.show ? "1" : "0")};
   transition: all 1s ease;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
+  margin: 10px 0 0 20px;
 `;
 
 const InputContainer = styled.div`
@@ -86,21 +95,28 @@ const PlanetInputs: React.FC = () => {
     preview,
     setPreview,
     mouseInactive,
+    addSatellites,
+    setAddSatellites,
+    saveSatellite,
   } = useAppContext();
   const [planetData, setPlanetData] = useState<Planet>({
     id: uuidv4(),
     color: "#ff0000",
-    orbitRadius: 100,
-    planetRadius: 100,
-    distance: 100,
+    orbitRadius: addSatellites ? 100 : 200,
+    planetRadius: addSatellites ? 3 : 100,
+    distance: addSatellites ? 50 : 100,
     pattern: "none",
-    speed: 0.3,
+    speed: addSatellites ? 0.3 : 0.3,
     initialAngle: 0,
     selected: false,
     satellites: [],
   });
   const screenHeight = window.innerHeight;
-  const maxDistance = (screenHeight * 0.8) / 2;
+  const minDistance = addSatellites ? 10 : 50;
+  const maxDistance = addSatellites ? 100 : (screenHeight * 0.8) / 2;
+  const minRadius = addSatellites ? 1 : 10;
+  const maxRadius = addSatellites ? 10 : 50;
+  const [isSun, setIsSun] = useState<boolean>(false);
 
   useEffect(() => {
     if (preview) {
@@ -128,8 +144,18 @@ const PlanetInputs: React.FC = () => {
       id: planetId,
       satellites: [],
     };
+    const newSatellite: Satellite = {
+      ...planetData,
+      orbitRadius: planetData.distance * 2,
+      id: planetId,
+    };
     setPreview(false);
-    savePlanet(newPlanet);
+    if (!addSatellites) savePlanet(newPlanet);
+    else {
+      setAddSatellites(false);
+      saveSatellite(newSatellite);
+    }
+
     cleanTempPlanet();
   };
 
@@ -153,41 +179,60 @@ const PlanetInputs: React.FC = () => {
       updateTempPlanet(undefined);
     }
   };
+  const handleIsSun = (checked: boolean) => {
+    setIsSun(checked);
+  };
 
   const handleRandom = () => {
-    const planetDistance = generateRandomNumber(50, maxDistance);
+    setPreview(true);
+    const planetDistance = generateRandomNumber(minDistance, maxDistance);
     const randomPlanet = {
       id: uuidv4(),
-      color: "#ff0000",
+      color: generateRandomHexColor(),
       orbitRadius: planetDistance * 2,
-      planetRadius: generateRandomNumber(10, 50),
+      planetRadius: generateRandomNumber(minRadius, maxRadius),
       distance: planetDistance,
       pattern: "none",
-      speed: generateRandomNumber(0.1, 1),
+      speed: Number(generateRandomNumber(0.1, 1).toFixed(2)),
       initialAngle: generateRandomNumber(0, 360),
       selected: false,
       satellites: [],
     };
+
+    console.log("Randomplanet ---->", randomPlanet);
 
     setPlanetData(randomPlanet);
   };
 
   function generateRandomNumber(min: number, max: number) {
     if (max <= 1) {
-      // Si el valor máximo es menor o igual a 1, genera un número decimal aleatorio
       const decimalRandomNumber = Math.random() * (max - min) + min;
       return decimalRandomNumber;
     } else {
-      // Si el valor máximo es mayor que 1, genera un número entero aleatorio
       const integerRandomNumber =
         Math.floor(Math.random() * (max - min + 1)) + min;
       return integerRandomNumber;
     }
   }
 
+  function generateRandomHexColor(): string {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+
+    const redComponent = r.toString(16).padStart(2, "0");
+    const greenComponent = g.toString(16).padStart(2, "0");
+    const blueComponent = b.toString(16).padStart(2, "0");
+
+    const hexColorCode = `#${redComponent}${greenComponent}${blueComponent}`;
+
+    return hexColorCode;
+  }
+
   return (
     <Container show={!mouseInactive}>
       <Icon></Icon>
+      {addSatellites && <p>Satellite</p>}
       <form onSubmit={handleSubmit}>
         <Label>Planet Radius</Label>
         <InputContainer>
@@ -203,20 +248,24 @@ const PlanetInputs: React.FC = () => {
           />
           <Info>{planetData.planetRadius}</Info>
         </InputContainer>
-        <Label>Distance</Label>
-        <InputContainer>
-          <Slider
-            type="range"
-            value={planetData.distance}
-            min="50"
-            max={maxDistance}
-            step="1"
-            onChange={(e) => {
-              handleInputChange("distance", parseInt(e.target.value, 10));
-            }}
-          />
-          <Info>{planetData.distance}</Info>
-        </InputContainer>
+        {!isSun && (
+          <>
+            <Label>Distance</Label>
+            <InputContainer>
+              <Slider
+                type="range"
+                value={planetData.distance}
+                min={minDistance}
+                max={maxDistance}
+                step="1"
+                onChange={(e) => {
+                  handleInputChange("distance", parseInt(e.target.value, 10));
+                }}
+              />
+              <Info>{planetData.distance}</Info>
+            </InputContainer>
+          </>
+        )}
         <Label>Speed 1-10</Label>
         <InputContainer>
           <Slider
@@ -253,11 +302,19 @@ const PlanetInputs: React.FC = () => {
             onChange={(e) => handleChecked(e.target.checked)}
           />
         </InputContainer>
+        <Label>Sun</Label>
+        <InputContainer>
+          <input
+            type="checkbox"
+            checked={isSun}
+            onChange={(e) => handleIsSun(e.target.checked)}
+          />
+        </InputContainer>
         <hr />
         <CirclePicker onChange={handleColorChange} />
         <Button type="submit">Submit</Button>
         <Button type="button" onClick={handleRandom}>
-          Rnadomize
+          Randomize
         </Button>
       </form>
     </Container>

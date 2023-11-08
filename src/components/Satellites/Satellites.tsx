@@ -1,37 +1,27 @@
-import { useEffect, useRef, memo, useState } from "react";
-import "./Planet.css";
+import { useEffect, useRef, memo } from "react";
+import "./Satellites.css";
 import { useAppContext } from "../../context/appContext";
 import styled from "styled-components";
-import Satellite from "../Satellites/Satellites";
+
 interface ContornoProps {
   radius: number;
   size?: number;
 }
-interface Planet {
+
+interface SatelliteSchema {
   id: string;
-  orbitRadius: number;
   planetRadius: number;
   distance: number;
   color: string;
   pattern: string;
   speed: number;
   initialAngle: number;
-  satellites?: Satellite[];
+  radius: number;
 }
 
-interface Satellite {
-  id: string;
-  satRadius: number;
-  distance: number;
-  color: string;
-  pattern: string;
-  speed: number;
-  initialAngle: number;
-}
-interface InnerPlanetProps {
-  color: string;
+interface SatelliteCompProps {
   radius: number;
-  selected: boolean;
+  color: string;
   hightContrast: boolean;
 }
 
@@ -40,39 +30,17 @@ interface OrbitProps {
   index: number;
   show: boolean;
 }
-interface PlanetProps {
+interface SatelliteProps {
   order?: number;
   data: any;
   onClick?: () => void; // Añadir la propiedad onClick
 }
 
-interface Positions {
-  x: number;
-  y: number;
-}
-
-interface PlanetsPositionObject {
-  id: Positions;
-}
-
-const Planet = (props: PlanetProps) => {
-  const {
-    planetsNumber,
-    preview,
-    orbits,
-    tempPlanet,
-    selectedPlanets,
-    hightContrast,
-    setPosition,
-    followedPlanet,
-    setFollowedPlanet,
-  } = useAppContext();
+const Satellite = (props: SatelliteProps) => {
+  const { planetsNumber, preview, orbits, tempPlanet, hightContrast } =
+    useAppContext();
   const movingElementRef = useRef(null);
-
-  const [planetsPos, setPlanetsPos] = useState<PlanetsPositionObject>();
-
-  const { planetRadius, distance, color, speed, initialAngle, id, satellites } =
-    props.data; //TO DO: Create interface
+  const { planetRadius, distance, color, speed, initialAngle } = props.data; //TO DO: Create interface
 
   useEffect(() => {
     const movingElement: any = movingElementRef.current;
@@ -101,43 +69,6 @@ const Planet = (props: PlanetProps) => {
         y - heightOffset
       }px)`;
 
-      // const positionsCopy = { ...planetsPos };
-
-      // setPlanetsPos({});
-
-      // positionsCopy[planetId] = {
-      //   x: -x,
-      //   y: -y,
-      // };
-
-      console.log("followedPlanet ---->", followedPlanet);
-      console.log(id);
-      if (id === "5") {
-        // console.log("screen.width ---->", screen.width);
-        // console.log("screen.height ---->", screen.height);
-        // console.log("pos ---->", {
-        //   x: -x - screen.width,
-        //   y: -y - screen.height,
-        // });
-
-        //works for scale: 3
-        // setPosition({
-        //   x: -x * 3 - screen.width - widthOffset,
-        //   y: -y * 3 - screen.height - heightOffset,
-        // });
-
-        // This works for scale: 1
-        // setPosition({
-        //   x: -x,
-        //   y: -y,
-        // });
-        // This works for scale: 2
-        setPosition({
-          x: -x * 2 - screen.width / 2 - widthOffset,
-          y: -y * 2 - screen.height / 2 - heightOffset,
-        });
-      }
-
       requestAnimationFrame(update);
     }
 
@@ -152,17 +83,11 @@ const Planet = (props: PlanetProps) => {
         show={orbits}
       >
         <MovingElement ref={movingElementRef}>
-          <InnerPlanet
+          <SatelliteBody
             color={color}
             radius={planetRadius}
-            selected={selectedPlanets.some((p) => p === id)}
             hightContrast={hightContrast}
-          >
-            {satellites.map((s, idx) => {
-              return <Satellite key={idx} data={s}></Satellite>;
-            })}
-            {/* <Contorno radius={planetRadius} /> */}
-          </InnerPlanet>
+          ></SatelliteBody>
         </MovingElement>
       </Orbit>
     </>
@@ -180,6 +105,7 @@ const Orbit = styled.div<OrbitProps>`
     props.show ? "1px solid rgba(255, 255, 255, 0.3)" : "none"};
   border-radius: 50%;
   margin: 0 auto;
+  z-index: ${(props) => (props.index ? props.index : "0")};
   transition: all 0.5s ease;
 `;
 
@@ -192,7 +118,7 @@ const MovingElement = styled.div`
   height: 50px;
 `;
 
-const InnerPlanet = styled.div<InnerPlanetProps>`
+const SatelliteBody = styled.div<SatelliteCompProps>`
   position: absolute;
   width: ${(props) =>
     props.hightContrast
@@ -210,23 +136,21 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   border-radius: 50%;
   transition: all 0.5s ease;
   border: ${(props) =>
-    (props.selected || props.hightContrast) && props.radius
-      ? "3px solid white"
-      : ""};
+    props.selected || props.hightContrast ? "3px solid white" : ""};
 `;
 
-// const Sat = styled.div`
-//   position: absolute;
-//   width: ${(props) => props.radius + "px" || "100px"};
-//   height: ${(props) => props.radius + "px" || "100px"};
-//   top: 50%;
-//   left: 50%;
-//   transform: translate(-50%, -50%);
-//   background-color: ${(props) => props.color || "blue"};
-//   border-radius: 50%;
-//   overflow: hidden;
-//   transition: all 0.5s ease;
-// `;
+const Sat = styled.div`
+  position: absolute;
+  width: ${(props) => props.radius + "px" || "100px"};
+  height: ${(props) => props.radius + "px" || "100px"};
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: ${(props) => props.color || "blue"};
+  border-radius: 50%;
+  overflow: hidden;
+  transition: all 0.5s ease;
+`;
 
 // const Contorno = styled.div<ContornoProps>`
 //   position: absolute;
@@ -253,4 +177,4 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
 //   }
 // `;
 
-export default memo(Planet);
+export default memo(Satellite);
