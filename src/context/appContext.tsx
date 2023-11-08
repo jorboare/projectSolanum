@@ -22,6 +22,14 @@ interface Planet {
   satellites: Satellite[];
 }
 
+interface MapStateObject {
+  scale: number;
+  translation: {
+    x: number;
+    y: number;
+  };
+}
+
 interface Satellite {
   id: string;
   orbitRadius: number;
@@ -61,8 +69,10 @@ interface AppContextType {
   setDemo: () => void;
   setPosition: (pos: any) => void;
   position: any;
-  followedPlanet: string;
+  followedPlanet: string | null;
   setFollowedPlanet: (id: string | null) => void;
+  mapState: MapStateObject;
+  setMapState: (state: MapStateObject) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -212,6 +222,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [hightContrast, setHightContrast] = useState<boolean>(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [followedPlanet, setFollowedPlanet] = useState<string | null>(null);
+  const [mapState, setMapState] = useState({
+    scale: 1,
+    translation: { x: 0, y: 0 },
+  });
 
   useEffect(() => {
     localStorage.setItem("appState", JSON.stringify(state));
@@ -302,12 +316,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     item.satellites.push(quantumMoon);
 
     const demoCopy = initialAppStateDemo.planets.map((e) => {
-      console.log(e);
       if (e.id === item.id) return item;
       else return e;
     });
-    console.log(item);
-    console.log(demoCopy);
 
     setState({ ...initialAppStateDemo, planets: demoCopy });
   };
@@ -344,6 +355,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPosition,
         followedPlanet,
         setFollowedPlanet,
+        mapState,
+        setMapState,
       }}
     >
       {children}

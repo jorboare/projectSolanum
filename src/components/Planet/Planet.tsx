@@ -110,8 +110,8 @@ const Planet = (props: PlanetProps) => {
       //   y: -y,
       // };
 
-      console.log("followedPlanet ---->", followedPlanet);
-      console.log(id);
+      // console.log("followedPlanet ---->", followedPlanet);
+      // console.log(id);
       if (id === "5") {
         // console.log("screen.width ---->", screen.width);
         // console.log("screen.height ---->", screen.height);

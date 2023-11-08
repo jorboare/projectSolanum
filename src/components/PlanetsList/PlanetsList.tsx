@@ -85,6 +85,7 @@ const PlanetsList: React.FC = () => {
     setDemo,
     setFollowedPlanet,
     followedPlanet,
+    setMapState,
   } = useAppContext();
   const [fullScreen, setFullScreen] = useState(false);
   const handleClick = (id: string) => {
@@ -158,6 +159,13 @@ const PlanetsList: React.FC = () => {
     }, 300);
   };
 
+  const resetValue = () => {
+    setMapState({
+      scale: 1,
+      translation: { x: 0, y: 0 },
+    });
+  };
+
   return (
     <>
       <SatContainer show={!mouseInactive} visible={showSatellites}>
@@ -198,7 +206,6 @@ const PlanetsList: React.FC = () => {
               if (followedPlanet) {
                 setFollowedPlanet(null);
               } else setFollowedPlanet(selectedPlanets[0]);
-              console.log("followedPlanet ---->", followedPlanet);
             }}
           >
             Follow
@@ -223,6 +230,7 @@ const PlanetsList: React.FC = () => {
         <button id="fullscreen-button" onClick={handleFullScreen}>
           {fullScreen ? "Close" : "Full screen"}
         </button>
+        <button onClick={resetValue}>Reset scale</button>
       </Container>
     </>
   );

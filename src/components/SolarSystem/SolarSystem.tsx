@@ -4,7 +4,6 @@ import Planet from "../Planet/Planet";
 import styled from "styled-components";
 //@ts-ignore
 import { MapInteractionCSS } from "react-map-interaction";
-import { useState } from "react";
 import { useEffect } from "react";
 
 const SolarContainer = styled.div`
@@ -17,18 +16,17 @@ const SolarContainer = styled.div`
   align-items: center;
 `;
 const SolarSystem = () => {
-  const { state, tempPlanet, sun, position, followedPlanet } = useAppContext();
-  const [mapState, setMapState] = useState({
-    scale: 1,
-    translation: { x: 0, y: 0 },
-  });
+  const {
+    state,
+    tempPlanet,
+    sun,
+    position,
+    followedPlanet,
+    mapState,
+    setMapState,
+  } = useAppContext();
 
   useEffect(() => {
-    console.log(mapState);
-  }, [mapState]);
-
-  useEffect(() => {
-    console.log("position", position);
     if (followedPlanet) {
       setMapState({
         scale: 2,
@@ -37,16 +35,8 @@ const SolarSystem = () => {
     }
   }, [position]);
 
-  const resetValue = () => {
-    setMapState({
-      scale: 1,
-      translation: { x: 0, y: 0 },
-    });
-  };
-
   return (
     <>
-      {/* <button onClick={resetValue}>Reset scale</button> */}
       <MapInteractionCSS
         showControls
         defaultValue={mapState}

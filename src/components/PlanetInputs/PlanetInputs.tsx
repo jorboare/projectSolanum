@@ -98,8 +98,9 @@ const PlanetInputs: React.FC = () => {
     addSatellites,
     setAddSatellites,
     saveSatellite,
+    setSun,
   } = useAppContext();
-  const [planetData, setPlanetData] = useState<Planet>({
+  const initialPlanet = {
     id: uuidv4(),
     color: "#ff0000",
     orbitRadius: addSatellites ? 100 : 200,
@@ -110,19 +111,39 @@ const PlanetInputs: React.FC = () => {
     initialAngle: 0,
     selected: false,
     satellites: [],
-  });
+  };
+  const [planetData, setPlanetData] = useState<Planet>(initialPlanet);
+  const [isSun, setIsSun] = useState<boolean>(false);
   const screenHeight = window.innerHeight;
   const minDistance = addSatellites ? 10 : 50;
   const maxDistance = addSatellites ? 100 : (screenHeight * 0.8) / 2;
   const minRadius = addSatellites ? 1 : 10;
-  const maxRadius = addSatellites ? 10 : 50;
-  const [isSun, setIsSun] = useState<boolean>(false);
+  const maxRadius = isSun ? 150 : addSatellites ? 10 : 50;
 
   useEffect(() => {
     if (preview) {
       updateTempPlanet({ ...planetData, speed: 0 });
     } else cleanTempPlanet();
   }, [planetData, preview]);
+
+  useEffect(() => {
+    if (isSun) {
+      setPlanetData({
+        id: uuidv4(),
+        color: "#ff8000",
+        orbitRadius: 0,
+        planetRadius: 100,
+        distance: 0,
+        pattern: "none",
+        speed: 0,
+        initialAngle: 0,
+        selected: false,
+        satellites: [],
+      });
+    } else {
+      setPlanetData(initialPlanet);
+    }
+  }, [isSun]);
 
   const handleInputChange = (
     field: keyof Planet,
@@ -155,6 +176,24 @@ const PlanetInputs: React.FC = () => {
       setAddSatellites(false);
       saveSatellite(newSatellite);
     }
+
+    cleanTempPlanet();
+  };
+  const handleSunSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+    const planetId = "0";
+
+    const newPlanet: Planet = {
+      ...planetData,
+      orbitRadius: planetData.distance,
+      id: planetId,
+      satellites: [],
+    };
+
+    console.log(newPlanet);
+
+    setSun(newPlanet);
+    setPreview(false);
 
     cleanTempPlanet();
   };
@@ -199,8 +238,6 @@ const PlanetInputs: React.FC = () => {
       satellites: [],
     };
 
-    console.log("Randomplanet ---->", randomPlanet);
-
     setPlanetData(randomPlanet);
   };
 
@@ -233,14 +270,14 @@ const PlanetInputs: React.FC = () => {
     <Container show={!mouseInactive}>
       <Icon></Icon>
       {addSatellites && <p>Satellite</p>}
-      <form onSubmit={handleSubmit}>
-        <Label>Planet Radius</Label>
+      <form onSubmit={(e) => (isSun ? handleSunSubmit(e) : handleSubmit(e))}>
+        <Label>{isSun ? "Sun" : "Planet"} Radius</Label>
         <InputContainer>
           <Slider
             type="range"
             value={planetData.planetRadius}
-            min="10"
-            max="50"
+            min={minRadius}
+            max={maxRadius}
             step="1"
             onChange={(e) =>
               handleInputChange("planetRadius", parseInt(e.target.value, 10))
@@ -266,34 +303,42 @@ const PlanetInputs: React.FC = () => {
             </InputContainer>
           </>
         )}
-        <Label>Speed 1-10</Label>
-        <InputContainer>
-          <Slider
-            type="range"
-            value={planetData.speed}
-            min="0.1"
-            max="1"
-            step="0.1"
-            onChange={(e) =>
-              handleInputChange("speed", parseFloat(e.target.value))
-            }
-          />
-          <Info>{planetData.speed}</Info>
-        </InputContainer>
-        <Label>Initial Angle</Label>
-        <InputContainer>
-          <Slider
-            type="range"
-            value={planetData.initialAngle}
-            min="0"
-            max="360"
-            step="1"
-            onChange={(e) =>
-              handleInputChange("initialAngle", parseFloat(e.target.value))
-            }
-          />
-          <Info>{planetData.initialAngle}º</Info>
-        </InputContainer>
+        {!isSun && (
+          <>
+            <Label>Speed 1-10</Label>
+            <InputContainer>
+              <Slider
+                type="range"
+                value={planetData.speed}
+                min="0.1"
+                max="1"
+                step="0.1"
+                onChange={(e) =>
+                  handleInputChange("speed", parseFloat(e.target.value))
+                }
+              />
+              <Info>{planetData.speed}</Info>
+            </InputContainer>
+          </>
+        )}
+        {!isSun && (
+          <>
+            <Label>Initial Angle</Label>
+            <InputContainer>
+              <Slider
+                type="range"
+                value={planetData.initialAngle}
+                min="0"
+                max="360"
+                step="1"
+                onChange={(e) =>
+                  handleInputChange("initialAngle", parseFloat(e.target.value))
+                }
+              />
+              <Info>{planetData.initialAngle}º</Info>
+            </InputContainer>
+          </>
+        )}
         <Label>Preview</Label>
         <InputContainer>
           <input
