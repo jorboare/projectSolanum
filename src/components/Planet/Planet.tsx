@@ -63,7 +63,7 @@ const Planet = (props: PlanetProps) => {
     tempPlanet,
     selectedPlanets,
     hightContrast,
-    setPosition,
+    setPositions,
     followedPlanet,
     setFollowedPlanet,
   } = useAppContext();
@@ -77,7 +77,7 @@ const Planet = (props: PlanetProps) => {
   useEffect(() => {
     const movingElement: any = movingElementRef.current;
     animateOrbit(movingElement, distance, speed, initialAngle);
-  }, [props]);
+  }, [props, followedPlanet]);
 
   const animateOrbit = (
     element: HTMLElement,
@@ -94,6 +94,9 @@ const Planet = (props: PlanetProps) => {
     angle -= 90;
     function update() {
       angle += orbitSpeed;
+      if (Math.round(angle) + 90 === 360) {
+        angle = -90;
+      }
       const x = Math.cos((angle * Math.PI) / 180) * orbitRadius;
       const y = Math.sin((angle * Math.PI) / 180) * orbitRadius;
 
@@ -101,38 +104,11 @@ const Planet = (props: PlanetProps) => {
         y - heightOffset
       }px)`;
 
-      // const positionsCopy = { ...planetsPos };
-
-      // setPlanetsPos({});
-
-      // positionsCopy[planetId] = {
-      //   x: -x,
-      //   y: -y,
-      // };
-
-      // console.log("followedPlanet ---->", followedPlanet);
-      // console.log(id);
-      if (id === "5") {
-        // console.log("screen.width ---->", screen.width);
-        // console.log("screen.height ---->", screen.height);
-        // console.log("pos ---->", {
-        //   x: -x - screen.width,
-        //   y: -y - screen.height,
-        // });
-
-        //works for scale: 3
-        // setPosition({
-        //   x: -x * 3 - screen.width - widthOffset,
-        //   y: -y * 3 - screen.height - heightOffset,
-        // });
-
-        // This works for scale: 1
-        // setPosition({
-        //   x: -x,
-        //   y: -y,
-        // });
-        // This works for scale: 2
-        setPosition({
+      if (id === followedPlanet) {
+        const newAngle = (Math.atan2(y, x) * 180) / Math.PI;
+        console.log("new angle ----->", Math.round(newAngle) + 90);
+        console.log("angle ----->", angle + 90);
+        setPositions({
           x: -x * 2 - screen.width / 2 - widthOffset,
           y: -y * 2 - screen.height / 2 - heightOffset,
         });
@@ -158,7 +134,7 @@ const Planet = (props: PlanetProps) => {
             selected={selectedPlanets.some((p) => p === id)}
             hightContrast={hightContrast}
           >
-            {satellites.map((s, idx) => {
+            {satellites.map((s: Satellite, idx: number) => {
               return <Satellite key={idx} data={s}></Satellite>;
             })}
             {/* <Contorno radius={planetRadius} /> */}

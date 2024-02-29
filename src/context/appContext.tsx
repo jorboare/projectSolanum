@@ -30,6 +30,10 @@ interface MapStateObject {
   };
 }
 
+interface Angles {
+  [key: string]: number;
+}
+
 interface Satellite {
   id: string;
   orbitRadius: number;
@@ -67,12 +71,14 @@ interface AppContextType {
   setHightContrast: (contrast: boolean) => void;
   hightContrast: boolean;
   setDemo: () => void;
-  setPosition: (pos: any) => void;
-  position: any;
+  setPositions: (pos: any) => void;
+  positions: any;
   followedPlanet: string | null;
   setFollowedPlanet: (id: string | null) => void;
   mapState: MapStateObject;
   setMapState: (state: MapStateObject) => void;
+  angles: Angles;
+  setAngles: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -220,12 +226,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [selectedPlanets, setSelectedPlanets] = useState<string[]>([]);
   const [addSatellites, setAddSatellites] = useState<boolean>(false);
   const [hightContrast, setHightContrast] = useState<boolean>(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [positions, setPositions] = useState({ x: 0, y: 0 });
   const [followedPlanet, setFollowedPlanet] = useState<string | null>(null);
   const [mapState, setMapState] = useState({
     scale: 1,
     translation: { x: 0, y: 0 },
   });
+  const [angles, setAngles] = useState({});
 
   useEffect(() => {
     localStorage.setItem("appState", JSON.stringify(state));
@@ -253,7 +260,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const newSelectedPlanets = [...selectedPlanets];
       newSelectedPlanets.splice(index, 1);
       setSelectedPlanets(newSelectedPlanets);
-    } else setSelectedPlanets([]);
+      if (id === followedPlanet) setFollowedPlanet(null);
+    } else {
+      setFollowedPlanet(null);
+      setSelectedPlanets([]);
+    }
   };
 
   const deletePlanets = () => {
@@ -351,12 +362,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
         hightContrast,
         setHightContrast,
         setDemo,
-        position,
-        setPosition,
+        positions,
+        setPositions,
         followedPlanet,
         setFollowedPlanet,
         mapState,
         setMapState,
+        angles,
+        setAngles,
       }}
     >
       {children}

@@ -208,7 +208,7 @@ const PlanetsList: React.FC = () => {
               } else setFollowedPlanet(selectedPlanets[0]);
             }}
           >
-            Follow
+            {followedPlanet ? "Unfollow" : "Follow"}
           </button>
         )}
         <button onClick={unSelectPlanets}>Unselect</button>

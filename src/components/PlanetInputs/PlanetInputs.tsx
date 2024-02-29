@@ -1,7 +1,7 @@
 import { useState, useEffect, useId } from "react";
 import styled from "styled-components";
 //@ts-ignore
-import { CirclePicker } from "react-color";
+import { SliderPicker } from "react-color";
 import { useAppContext } from "../../context/appContext";
 import "./PlanetInputs.css";
 import { v4 as uuidv4 } from "uuid";
@@ -49,6 +49,7 @@ const Container = styled.div<ContainerProps>`
   backdrop-filter: blur(8.3px);
   -webkit-backdrop-filter: blur(8.3px);
   margin: 10px 0 0 20px;
+  width: 250px;
 `;
 
 const InputContainer = styled.div`
@@ -356,7 +357,7 @@ const PlanetInputs: React.FC = () => {
           />
         </InputContainer>
         <hr />
-        <CirclePicker onChange={handleColorChange} />
+        <SliderPicker color={planetData.color} onChange={handleColorChange} />
         <Button type="submit">Submit</Button>
         <Button type="button" onClick={handleRandom}>
           Randomize

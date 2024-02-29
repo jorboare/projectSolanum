@@ -20,7 +20,7 @@ const SolarSystem = () => {
     state,
     tempPlanet,
     sun,
-    position,
+    positions,
     followedPlanet,
     mapState,
     setMapState,
@@ -30,10 +30,10 @@ const SolarSystem = () => {
     if (followedPlanet) {
       setMapState({
         scale: 2,
-        translation: position,
+        translation: positions,
       });
     }
-  }, [position]);
+  }, [positions]);
 
   return (
     <>
