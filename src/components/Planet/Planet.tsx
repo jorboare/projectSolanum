@@ -153,10 +153,11 @@ const Orbit = styled.div<OrbitProps>`
   left: 50%;
   transform: translate(-50%, -50%);
   border: ${(props) =>
-    props.show ? "1px solid rgba(255, 255, 255, 0.3)" : "none"};
+    props.show ? "1px solid rgba(255, 255, 255, 0.5)" : "none"};
   border-radius: 50%;
   margin: 0 auto;
   transition: all 0.5s ease;
+  z-index: ${(props) => props.index};
 `;
 
 const MovingElement = styled.div`

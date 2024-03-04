@@ -229,8 +229,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [positions, setPositions] = useState({ x: 0, y: 0 });
   const [followedPlanet, setFollowedPlanet] = useState<string | null>(null);
   const [mapState, setMapState] = useState({
-    scale: 1,
-    translation: { x: 0, y: 0 },
+    scale: 0.5,
+    translation: { x: window.innerWidth / 2, y: window.innerHeight / 4 },
   });
   const [angles, setAngles] = useState({});
 

@@ -9,7 +9,7 @@ import { useEffect } from "react";
 const SolarContainer = styled.div`
   position: relative;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   z-index: 0;
   display: flex;
   justify-content: center;
@@ -44,7 +44,7 @@ const SolarSystem = () => {
         onChange={(value: any) => setMapState(value)}
       >
         <SolarContainer>
-          {tempPlanet && <Planet data={tempPlanet} />}
+          {tempPlanet && <Planet data={tempPlanet} order={-100} />}
           {sun && <Planet data={sun} />}
           {state.planets &&
             state.planets.map((e, idx) => (

@@ -1,11 +1,12 @@
 import { useState, useEffect, useId } from "react";
 import styled from "styled-components";
 //@ts-ignore
-import { SliderPicker } from "react-color";
+import { HuePicker } from "react-color";
 import { useAppContext } from "../../context/appContext";
 import "./PlanetInputs.css";
 import { v4 as uuidv4 } from "uuid";
-
+import Arrow from "../../utils/Arrow";
+import arrowIcon from "../../assets/right-arrow.png";
 interface Planet {
   id: string;
   orbitRadius: number;
@@ -85,6 +86,27 @@ const Info = styled.p`
 
 const Button = styled.button`
   margin-top: 20px;
+`;
+
+const ArrowBtn = styled.div`
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  position: absolute;
+  top: 20px;
+  left: 290px;
+  z-index: 999;
+  transition: all 1s ease;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
+  width: 20px;
+  height: 40px;
+  padding-left: 5px;
+`;
+const ArrowImg = styled.img`
+  margin-top: 12.5px;
+  width: 15px;
 `;
 
 const PlanetInputs: React.FC = () => {
@@ -267,103 +289,122 @@ const PlanetInputs: React.FC = () => {
     return hexColorCode;
   }
 
+  const handleToggle = (e: Event) => {};
+
   return (
-    <Container show={!mouseInactive}>
-      <Icon></Icon>
-      {addSatellites && <p>Satellite</p>}
-      <form onSubmit={(e) => (isSun ? handleSunSubmit(e) : handleSubmit(e))}>
-        <Label>{isSun ? "Sun" : "Planet"} Radius</Label>
-        <InputContainer>
-          <Slider
-            type="range"
-            value={planetData.planetRadius}
-            min={minRadius}
-            max={maxRadius}
-            step="1"
-            onChange={(e) =>
-              handleInputChange("planetRadius", parseInt(e.target.value, 10))
-            }
+    <>
+      <Container show={!mouseInactive}>
+        <Icon></Icon>
+        {addSatellites && <p>Satellite</p>}
+        <form onSubmit={(e) => (isSun ? handleSunSubmit(e) : handleSubmit(e))}>
+          <Label>{isSun ? "Sun" : "Planet"} Radius</Label>
+          <InputContainer>
+            <Slider
+              type="range"
+              value={planetData.planetRadius}
+              min={minRadius}
+              max={maxRadius}
+              step="1"
+              onChange={(e) =>
+                handleInputChange("planetRadius", parseInt(e.target.value, 10))
+              }
+            />
+            <Info>{planetData.planetRadius}</Info>
+          </InputContainer>
+          {!isSun && (
+            <>
+              <Label>Distance</Label>
+              <InputContainer>
+                <Slider
+                  type="range"
+                  value={planetData.distance}
+                  min={minDistance}
+                  max={maxDistance}
+                  step="1"
+                  onChange={(e) => {
+                    handleInputChange("distance", parseInt(e.target.value, 10));
+                  }}
+                />
+                <Info>{planetData.distance}</Info>
+              </InputContainer>
+            </>
+          )}
+          {!isSun && (
+            <>
+              <Label>Speed 1-10</Label>
+              <InputContainer>
+                <Slider
+                  type="range"
+                  value={planetData.speed}
+                  min="0.1"
+                  max="1"
+                  step="0.1"
+                  onChange={(e) =>
+                    handleInputChange("speed", parseFloat(e.target.value))
+                  }
+                />
+                <Info>{planetData.speed}</Info>
+              </InputContainer>
+            </>
+          )}
+          {!isSun && (
+            <>
+              <Label>Initial Angle</Label>
+              <InputContainer>
+                <Slider
+                  type="range"
+                  value={planetData.initialAngle}
+                  min="0"
+                  max="360"
+                  step="1"
+                  onChange={(e) =>
+                    handleInputChange(
+                      "initialAngle",
+                      parseFloat(e.target.value)
+                    )
+                  }
+                />
+                <Info>{planetData.initialAngle}º</Info>
+              </InputContainer>
+            </>
+          )}
+          <Label>Preview</Label>
+          <InputContainer>
+            <input
+              type="checkbox"
+              checked={preview}
+              onChange={(e) => handleChecked(e.target.checked)}
+            />
+          </InputContainer>
+          <Label>Sun</Label>
+          <InputContainer>
+            <input
+              type="checkbox"
+              checked={isSun}
+              onChange={(e) => handleIsSun(e.target.checked)}
+            />
+          </InputContainer>
+          <hr />
+          <HuePicker
+            color={planetData.color}
+            onChange={handleColorChange}
+            style={{ width: "100px" }}
           />
-          <Info>{planetData.planetRadius}</Info>
-        </InputContainer>
-        {!isSun && (
-          <>
-            <Label>Distance</Label>
-            <InputContainer>
-              <Slider
-                type="range"
-                value={planetData.distance}
-                min={minDistance}
-                max={maxDistance}
-                step="1"
-                onChange={(e) => {
-                  handleInputChange("distance", parseInt(e.target.value, 10));
-                }}
-              />
-              <Info>{planetData.distance}</Info>
-            </InputContainer>
-          </>
-        )}
-        {!isSun && (
-          <>
-            <Label>Speed 1-10</Label>
-            <InputContainer>
-              <Slider
-                type="range"
-                value={planetData.speed}
-                min="0.1"
-                max="1"
-                step="0.1"
-                onChange={(e) =>
-                  handleInputChange("speed", parseFloat(e.target.value))
-                }
-              />
-              <Info>{planetData.speed}</Info>
-            </InputContainer>
-          </>
-        )}
-        {!isSun && (
-          <>
-            <Label>Initial Angle</Label>
-            <InputContainer>
-              <Slider
-                type="range"
-                value={planetData.initialAngle}
-                min="0"
-                max="360"
-                step="1"
-                onChange={(e) =>
-                  handleInputChange("initialAngle", parseFloat(e.target.value))
-                }
-              />
-              <Info>{planetData.initialAngle}º</Info>
-            </InputContainer>
-          </>
-        )}
-        <Label>Preview</Label>
-        <InputContainer>
-          <input
-            type="checkbox"
-            checked={preview}
-            onChange={(e) => handleChecked(e.target.checked)}
-          />
-        </InputContainer>
-        <Label>Sun</Label>
-        <InputContainer>
-          <input
-            type="checkbox"
-            checked={isSun}
-            onChange={(e) => handleIsSun(e.target.checked)}
-          />
-        </InputContainer>
-        <hr />
-        <SliderPicker color={planetData.color} onChange={handleColorChange} />
-        <Button type="submit">Submit</Button>
-        <Button type="button" onClick={handleRandom}>
-          Randomize
-        </Button>
-      </form>
-    </Container>
+          <Button type="submit">Submit</Button>
+          <Button type="button" onClick={handleRandom}>
+            Randomize
+          </Button>
+        </form>
+        <ArrowBtn
+          onClick={(e) => {
+            handleToggle(e);
+          }}
+        >
+          <ArrowImg src={arrowIcon} />
+        </ArrowBtn>
+        <Arrow />
+      </Container>
+    </>
   );
 };
 
