@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 //@ts-ignore
 import { HuePicker } from "react-color";

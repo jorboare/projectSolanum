@@ -13,6 +13,8 @@ import ResetView from "../../assets/Icons/ResetView.png";
 interface MenuDisplayed {
   open: boolean;
   idx?: number;
+  planetList?: boolean;
+  size?: string;
 }
 
 const icons = [
@@ -48,12 +50,14 @@ const Menu = () => {
     followedPlanet,
     setMapState,
     resetMapState,
+    showPlanetList,
+    setShowPlanetList,
   } = useAppContext();
 
   const handleClick = (action: string) => {
     switch (action) {
       case "showPlanets":
-        //ADD ACTION SHOW PLANET MENU
+        setShowPlanetList(!showPlanetList);
         break;
       case "resetPlanets":
         cleanState();
@@ -76,12 +80,27 @@ const Menu = () => {
   };
 
   const [openMenu, setOpenMenu] = useState(false);
+
+  const handleMenuClick = () => {
+    if (showPlanetList) {
+      setShowPlanetList(!showPlanetList);
+    } else {
+      setOpenMenu(!openMenu);
+    }
+  };
+
+  useEffect(() => {
+    if (showPlanetList && openMenu) setOpenMenu(!openMenu);
+  }, [showPlanetList]);
   return (
     <>
       <MenuContainer open={openMenu}>
-        <HamburguerIcon onClick={() => setOpenMenu(!openMenu)} open={openMenu}>
-          <MenuIcon open={openMenu}></MenuIcon>
-        </HamburguerIcon>
+        <IconContainer onClick={() => handleMenuClick()} open={openMenu}>
+          <HamburguerIcon
+            open={openMenu}
+            planetList={showPlanetList}
+          ></HamburguerIcon>
+        </IconContainer>
       </MenuContainer>
       <MenuDisplayed open={openMenu}>
         {icons.map((e, idx) => (
@@ -89,7 +108,7 @@ const Menu = () => {
             open={openMenu}
             idx={idx}
             src={e.icon}
-            size={e.size}
+            key={idx}
             onClick={() => handleClick(e.action)}
           />
         ))}
@@ -111,30 +130,33 @@ const MenuContainer = styled.div<MenuDisplayed>`
   -webkit-backdrop-filter: blur(8.3px);
   z-index: 100;
   transition: all 0.5s ease;
+  display: flex;
+  align-items: right;
+  justify-content: flex-end;
 `;
 
-const HamburguerIcon = styled.div`
-  position: absolute;
-  top: 50px;
-  right: 50px;
+const IconContainer = styled.div<MenuDisplayed>`
   width: 100px;
   height: 100px;
-  transform: translate(50%, -50%);
   border-radius: 50%;
   z-index: 400;
   background-color: ${(props) =>
     props.open ? "rgba(255, 255, 255, 0.6)" : ""};
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-const MenuIcon = styled.div<MenuDisplayed>`
-  position: absolute;
-  top: 50px;
-  right: 50px;
-  transform: translate(50%, -50%);
+const HamburguerIcon = styled.div<MenuDisplayed>`
   width: 40px;
   height: 2px;
-  background-color: rgba(66, 66, 66, ${(props) => (props.open ? "0" : "1")});
+  background-color: rgba(
+    66,
+    66,
+    66,
+    ${(props) => (props.open ? "0" : props.planetList ? "0" : "1")}
+  );
   transition: all 0.5s ease;
   z-index: 450;
   &:after,
@@ -148,15 +170,31 @@ const MenuIcon = styled.div<MenuDisplayed>`
   }
 
   &:after {
-    top: ${(props) => (props.open ? "1px" : "-6px")};
-    transform: ${(props) => (props.open ? "rotate(45deg)" : "rotate(0deg)")};
+    bottom: ${(props) =>
+      props.open ? "50%" : props.planetList ? "50%" : "55%"};
+    transform: ${(props) =>
+      props.open
+        ? "rotate(45deg)"
+        : props.planetList
+        ? "rotate(135deg)"
+        : "rotate(0deg)"};
     height: 2px;
+    width: ${(props) => (props.planetList ? "20px" : "40px")};
+    margin-left: ${(props) => (props.planetList ? "17px" : "")};
   }
 
   &:before {
-    bottom: ${(props) => (props.open ? "0px" : "-6px")};
-    transform: ${(props) => (props.open ? "rotate(135deg)" : "rotate(0deg)")};
+    bottom: ${(props) =>
+      props.open ? "50%" : props.planetList ? "50%" : "42%"};
+    transform: ${(props) =>
+      props.open
+        ? "rotate(135deg)"
+        : props.planetList
+        ? "rotate(45deg)"
+        : "rotate(0deg)"};
     height: 2px;
+    width: ${(props) => (props.planetList ? "20px" : "40px")};
+    margin-left: ${(props) => (props.planetList ? "3px" : "")};
   }
 `;
 
@@ -177,7 +215,7 @@ const MenuButtons = styled.img<MenuDisplayed>`
   position: absolute;
   top: 50%;
   right: 0px;
-  width: ${(props) => (props.size ? `${props.size}px` : "60px")};
+  width: 60px;
   filter: invert(1);
   transform: translateY(-50%)
     ${(props) =>
@@ -185,7 +223,7 @@ const MenuButtons = styled.img<MenuDisplayed>`
         ? `translateX(${-420 + props.idx * (60 + 20)}px)`
         : "translateX(50px)"};
   opacity: ${(props) => (props.open ? "1" : "0")};
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity 0.3s ease, transform 0.4s ease;
   transition-delay: ${(props) =>
     (props.open ? 300 + props.idx * 100 : props.idx * -100) + "ms"};
   cursor: pointer;

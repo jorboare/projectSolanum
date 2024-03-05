@@ -22,51 +22,6 @@ interface SatContainerProps {
   visible: boolean;
 }
 
-const Container = styled.div<ContainerProps>`
-  height: 150px;
-  width: 90%;
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8.3px);
-  -webkit-backdrop-filter: blur(8.3px);
-  border-radius: 20px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  opacity: ${(props) => (props.show ? "1" : "0")};
-  transition: all 1s ease;
-  margin: 0 5% 20px 5%;
-`;
-const SatContainer = styled.div<SatContainerProps>`
-  height: ${(props) => (props.visible ? "100px" : "0px")};
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8.3px);
-  -webkit-backdrop-filter: blur(8.3px);
-  border-radius: 20px;
-  position: absolute;
-  bottom: 160px;
-  left: 0;
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  opacity: ${(props) => (props.show ? "1" : "0")};
-  transition: all 0.3s ease;
-  margin: 0 5% 20px 5%;
-  padding: ${(props) => (props.visible ? "10px 0px 10px 10px" : "0px")};
-  & > * {
-    margin-right: 10px;
-    height: ${(props) => (props.visible ? "30px" : "0px")};
-    width: ${(props) => (props.visible ? "30px" : "0px")};
-  }
-`;
-
 const PlanetsList: React.FC = () => {
   const {
     state,
@@ -86,6 +41,7 @@ const PlanetsList: React.FC = () => {
     setFollowedPlanet,
     followedPlanet,
     setMapState,
+    showPlanetList,
   } = useAppContext();
   const [fullScreen, setFullScreen] = useState(false);
   const handleClick = (id: string) => {
@@ -184,7 +140,7 @@ const PlanetsList: React.FC = () => {
         })}
         <button onClick={() => setShowSatellites(false)}>Hide</button>
       </SatContainer>
-      <Container show={!mouseInactive}>
+      <Container show={showPlanetList}>
         {state.planets
           ? state.planets.map((p) => (
               <PlanetGenerator
@@ -195,7 +151,7 @@ const PlanetsList: React.FC = () => {
               />
             ))
           : null}
-        {selectedPlanets.length === 1 && (
+        {/* {selectedPlanets.length === 1 && (
           <button onClick={() => setAddSatellites(!addSatellites)}>
             Add satellites
           </button>
@@ -230,10 +186,56 @@ const PlanetsList: React.FC = () => {
         <button id="fullscreen-button" onClick={handleFullScreen}>
           {fullScreen ? "Close" : "Full screen"}
         </button>
-        <button onClick={resetValue}>Reset scale</button>
+        <button onClick={resetValue}>Reset scale</button> */}
       </Container>
     </>
   );
 };
 
+const Container = styled.div<ContainerProps>`
+  width: 100px;
+  max-height: ${(props) => (props.show ? "500px" : "100px")};
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
+  border-radius: 50px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: ${(props) => (props.show ? "20px 0 120px 0" : "0")};
+  opacity: ${(props) => (props.show ? "1" : "0")};
+  gap: 20px;
+  transition: all 1s ease;
+  z-index: 100;
+`;
+const SatContainer = styled.div<SatContainerProps>`
+  height: ${(props) => (props.visible ? "100px" : "0px")};
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
+  border-radius: 20px;
+  position: absolute;
+  bottom: 160px;
+  left: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  opacity: ${(props) => (props.show ? "1" : "0")};
+  transition: all 0.3s ease;
+  margin: 0 5% 20px 5%;
+  padding: ${(props) => (props.visible ? "10px 0px 10px 10px" : "0px")};
+  & > * {
+    margin-right: 10px;
+    height: ${(props) => (props.visible ? "30px" : "0px")};
+    width: ${(props) => (props.visible ? "30px" : "0px")};
+  }
+`;
 export default PlanetsList;

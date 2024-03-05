@@ -14,7 +14,7 @@ function App() {
       <AppProvider>
         {/* <PlanetInputs /> */}
         <SolarSystem />
-        {/* <PlanetsList /> */}
+        <PlanetsList />
         <Menu />
       </AppProvider>
     </React.StrictMode>

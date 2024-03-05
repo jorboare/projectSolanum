@@ -80,6 +80,8 @@ interface AppContextType {
   angles: Angles;
   setAngles: () => void;
   resetMapState: () => void;
+  showPlanetList: boolean;
+  setShowPlanetList: (show: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -234,6 +236,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     translation: { x: window.innerWidth / 2, y: window.innerHeight / 4 },
   });
   const [angles, setAngles] = useState({});
+  const [showPlanetList, setShowPlanetList] = useState<boolean>(false);
 
   useEffect(() => {
     localStorage.setItem("appState", JSON.stringify(state));
@@ -379,6 +382,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         angles,
         setAngles,
         resetMapState,
+        showPlanetList,
+        setShowPlanetList,
       }}
     >
       {children}
