@@ -79,6 +79,7 @@ interface AppContextType {
   setMapState: (state: MapStateObject) => void;
   angles: Angles;
   setAngles: () => void;
+  resetMapState: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -305,6 +306,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const resetMapState = () => {
+    setMapState({
+      scale: 0.5,
+      translation: { x: window.innerWidth / 2, y: window.innerHeight / 4 },
+    });
+  };
+
   const setDemo = () => {
     const quantumMoon = {
       id: "6",
@@ -370,6 +378,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setMapState,
         angles,
         setAngles,
+        resetMapState,
       }}
     >
       {children}

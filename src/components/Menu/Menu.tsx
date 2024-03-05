@@ -1,33 +1,97 @@
 import { useState, useEffect, useId } from "react";
+import { useAppContext } from "../../context/appContext";
+
 import styled from "styled-components";
 //@ts-ignore
 import { HuePicker } from "react-color";
 import PlanetIcon from "../../assets/Icons/Planets.png";
 import ResetIcon from "../../assets/Icons/Reset.png";
 import OrbitsIcon from "../../assets/Icons/Orbits.png";
+import HighContrast from "../../assets/Icons/HighContrast.png";
+import Demo from "../../assets/Icons/Demo.png";
+import ResetView from "../../assets/Icons/ResetView.png";
 interface MenuDisplayed {
   open: boolean;
   idx?: number;
 }
 
 const icons = [
-  { name: "Planets", icon: PlanetIcon, size: 50 },
-  { name: "Reset", icon: ResetIcon },
-  { name: "Orbits", icon: OrbitsIcon },
+  { name: "Planets", icon: PlanetIcon, action: "showPlanets" },
+  { name: "Reset", icon: ResetIcon, action: "resetPlanets" },
+  { name: "Orbits", icon: OrbitsIcon, action: "showOrbits" },
+  {
+    name: "High contrast",
+    icon: HighContrast,
+    action: "highContrastMode",
+  },
+  { name: "Demo", icon: Demo, action: "showDemo" },
+  { name: "Reset View", icon: ResetView, action: "resetView" },
 ];
 
 const Menu = () => {
+  const {
+    state,
+    cleanState,
+    selectPlanet,
+    handleOrbits,
+    setMouseInactive,
+    mouseInactive,
+    deletePlanets,
+    deselectPlanet,
+    selectedPlanets,
+    addSatellites,
+    setAddSatellites,
+    hightContrast,
+    setHightContrast,
+    setDemo,
+    setFollowedPlanet,
+    followedPlanet,
+    setMapState,
+    resetMapState,
+  } = useAppContext();
+
+  const handleClick = (action: string) => {
+    switch (action) {
+      case "showPlanets":
+        //ADD ACTION SHOW PLANET MENU
+        break;
+      case "resetPlanets":
+        cleanState();
+        break;
+      case "showOrbits":
+        handleOrbits();
+        break;
+      case "highContrastMode":
+        setHightContrast(!hightContrast);
+        break;
+      case "showDemo":
+        setDemo();
+        break;
+      case "resetView":
+        resetMapState();
+        break;
+      default:
+        return;
+    }
+  };
+
   const [openMenu, setOpenMenu] = useState(false);
   return (
     <>
       <MenuContainer open={openMenu}>
-        <MenuButton onClick={() => setOpenMenu(!openMenu)} open={openMenu}>
+        <HamburguerIcon onClick={() => setOpenMenu(!openMenu)} open={openMenu}>
           <MenuIcon open={openMenu}></MenuIcon>
-        </MenuButton>
+        </HamburguerIcon>
       </MenuContainer>
       <MenuDisplayed open={openMenu}>
         {icons.map((e, idx) => (
-          <IconPlanet open={openMenu} idx={idx} src={e.icon} size={e.size} />
+          <MenuButtons
+            open={openMenu}
+            idx={idx}
+            src={e.icon}
+            size={e.size}
+            onClick={() => handleClick(e.action)}
+          />
         ))}
       </MenuDisplayed>
     </>
@@ -39,7 +103,7 @@ const MenuContainer = styled.div<MenuDisplayed>`
   bottom: 20px;
   right: 20px;
   height: 100px;
-  width: ${(props) => (props.open ? "360px" : "100px")};
+  width: ${(props) => (props.open ? "600px" : "100px")};
   border-radius: ${(props) => (props.open ? "50px 50px 50px 50px" : "50px")};
   background: rgba(255, 255, 255, 0.6);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -49,7 +113,7 @@ const MenuContainer = styled.div<MenuDisplayed>`
   transition: all 0.5s ease;
 `;
 
-const MenuButton = styled.div`
+const HamburguerIcon = styled.div`
   position: absolute;
   top: 50px;
   right: 50px;
@@ -91,7 +155,7 @@ const MenuIcon = styled.div<MenuDisplayed>`
 
   &:before {
     bottom: ${(props) => (props.open ? "0px" : "-6px")};
-    transform: ${(props) => (props.open ? "rotate(-45deg)" : "rotate(0deg)")};
+    transform: ${(props) => (props.open ? "rotate(135deg)" : "rotate(0deg)")};
     height: 2px;
   }
 `;
@@ -102,14 +166,14 @@ const MenuDisplayed = styled.div<MenuDisplayed>`
   bottom: 20px;
   right: 120px;
   height: 100px;
-  width: ${(props) => (props.open ? "320px" : "0px")};
+  width: ${(props) => (props.open ? "520px" : "0px")};
   border-radius: ${(props) => (props.open ? "25px 0 0 25px" : "25px 0 0 25px")};
   z-index: 200;
   transition: all 0.5s ease-in-out;
   overflow: hidden;
 `;
 
-const IconPlanet = styled.img<MenuDisplayed>`
+const MenuButtons = styled.img<MenuDisplayed>`
   position: absolute;
   top: 50%;
   right: 0px;
@@ -118,7 +182,7 @@ const IconPlanet = styled.img<MenuDisplayed>`
   transform: translateY(-50%)
     ${(props) =>
       props.open
-        ? `translateX(${-190 + props.idx * (60 + 20)}px)`
+        ? `translateX(${-420 + props.idx * (60 + 20)}px)`
         : "translateX(50px)"};
   opacity: ${(props) => (props.open ? "1" : "0")};
   transition: opacity 0.5s ease, transform 0.5s ease;
