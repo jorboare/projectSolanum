@@ -14,7 +14,11 @@ const Planet = styled.div<PlanetProps>`
   height: ${(props) => (props.size ? `${props.size}px` : "50px")};
   border-radius: 50%;
   border: ${(props) =>
-    props.selected ? `5px solid white` : "0px solid white"};
+    props.selected
+      ? `5px solid white`
+      : props.color
+      ? "0px solid white"
+      : "5px dotted black"};
   transform: ${(props) => (props.selected ? `scale(1.2)` : "")};
   transition: all 0.5s ease;
   position: relative;
