@@ -16,9 +16,7 @@ const Container = styled.div`
 `;
 
 const Arrow = (props: any) => {
-  useEffect(() => {
-    console.log(props);
-  }, [props]);
+  useEffect(() => {}, [props]);
   return <Container></Container>;
 };
 

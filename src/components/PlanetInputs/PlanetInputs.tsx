@@ -142,8 +142,6 @@ const PlanetInputs: React.FC = () => {
       satellites: [],
     };
 
-    console.log(newPlanet);
-
     setSun(newPlanet);
     setPreview(false);
 

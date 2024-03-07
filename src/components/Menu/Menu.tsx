@@ -119,7 +119,6 @@ const Menu = () => {
   useEffect(() => {
     switch (openedMenu) {
       case "Inputs":
-        console.log("Inputs");
         setOpenHorizontalMenu(false);
         setShowPlanetList(false);
         break;

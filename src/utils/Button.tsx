@@ -19,9 +19,6 @@ const BtnText = styled.div`
   color: red;
 `;
 const Button = (props: any) => {
-  useEffect(() => {
-    console.log(props);
-  }, [props]);
   return (
     <Container>
       <BtnText>{props.text}</BtnText>

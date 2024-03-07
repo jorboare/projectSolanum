@@ -80,7 +80,6 @@ const PlanetsList: React.FC = () => {
       setSatellites(planet.satellites.map((e) => e));
       setShowSatellites(selectedPlanets.length === 1);
     } else {
-      console.log(satellites);
       setShowSatellites(false);
       setSatellites([]);
     }
