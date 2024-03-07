@@ -1,12 +1,8 @@
-import { useEffect, useRef, memo, useState } from "react";
+import { useEffect, useRef, memo } from "react";
 import "./Planet.css";
 import { useAppContext } from "../../context/appContext";
 import styled from "styled-components";
 import Satellite from "../Satellites/Satellites";
-interface ContornoProps {
-  radius: number;
-  size?: number;
-}
 interface Planet {
   id: string;
   orbitRadius: number;
@@ -33,6 +29,8 @@ interface InnerPlanetProps {
   radius: number;
   selected: boolean;
   hightContrast: boolean;
+  followed?: boolean;
+  sun?: boolean;
 }
 
 interface OrbitProps {
@@ -47,25 +45,14 @@ interface PlanetProps {
   onClick?: () => void; // Añadir la propiedad onClick
 }
 
-interface Positions {
-  x: number;
-  y: number;
-}
-
-interface PlanetsPositionObject {
-  id: Positions;
-}
-
 const Planet = (props: PlanetProps) => {
   const {
     planetsNumber,
-    preview,
     orbits,
     selectedPlanets,
     hightContrast,
     setPositions,
     followedPlanet,
-    setFollowedPlanet,
   } = useAppContext();
   const movingElementRef = useRef(null);
   const { planetRadius, distance, color, speed, initialAngle, id, satellites } =
@@ -124,7 +111,7 @@ const Planet = (props: PlanetProps) => {
             radius={planetRadius}
             selected={selectedPlanets.some((p) => p === id)}
             hightContrast={hightContrast}
-            followedPlanet={followedPlanet ? true : false}
+            followed={followedPlanet ? true : false}
           >
             {satellites.map((s: Satellite, idx: number) => {
               return <Satellite key={idx} data={s}></Satellite>;
@@ -192,9 +179,7 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   border-radius: 50%;
   transition: all 0.5s ease;
   border: ${(props) =>
-    (props.selected || props.hightContrast) &&
-    props.radius &&
-    !props.followedPlanet
+    (props.selected || props.hightContrast) && props.radius && !props.followed
       ? "3px solid white"
       : ""};
   filter: ${(props) => (props.sun ? "blur(40px)" : "")};

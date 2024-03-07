@@ -30,10 +30,6 @@ interface MapStateObject {
   };
 }
 
-interface Angles {
-  [key: string]: number;
-}
-
 interface Satellite {
   id: string;
   orbitRadius: number;
@@ -77,8 +73,6 @@ interface AppContextType {
   setFollowedPlanet: (id: string | null) => void;
   mapState: MapStateObject;
   setMapState: (state: MapStateObject) => void;
-  angles: Angles;
-  setAngles: () => void;
   resetMapState: () => void;
   showPlanetList: boolean;
   setShowPlanetList: (show: boolean) => void;
@@ -237,7 +231,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     scale: 0.5,
     translation: { x: window.innerWidth / 2, y: window.innerHeight / 4 },
   });
-  const [angles, setAngles] = useState({});
   const [showPlanetList, setShowPlanetList] = useState<boolean>(false);
   const [showPlanetInput, setShowPlanetInput] = useState<boolean>(false);
 
@@ -382,8 +375,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setFollowedPlanet,
         mapState,
         setMapState,
-        angles,
-        setAngles,
         resetMapState,
         showPlanetList,
         setShowPlanetList,

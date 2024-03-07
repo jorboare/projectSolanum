@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from "react";
+import { useState, useEffect } from "react";
 import { useAppContext } from "../../context/appContext";
 
 import styled from "styled-components";
@@ -50,23 +50,15 @@ const buttons = {
 
 const Menu = () => {
   const {
-    state,
     cleanState,
-    selectPlanet,
     handleOrbits,
-    setMouseInactive,
-    mouseInactive,
-    deletePlanets,
     deselectPlanet,
     selectedPlanets,
-    addSatellites,
-    setAddSatellites,
     hightContrast,
     setHightContrast,
     setDemo,
     setFollowedPlanet,
     followedPlanet,
-    setMapState,
     resetMapState,
     showPlanetList,
     setShowPlanetList,
@@ -138,7 +130,7 @@ const Menu = () => {
     if (showPlanetList) {
       setOpenHorizontalMenu(false);
       setShowPlanetList(!showPlanetList);
-      if (showPlanetList) deselectPlanet();
+      if (showPlanetList) deselectPlanet("");
     } else if (showPlanetInput) {
       setShowPlanetInput(!showPlanetInput);
       setOpenHorizontalMenu(false);
