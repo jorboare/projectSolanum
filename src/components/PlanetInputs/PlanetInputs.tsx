@@ -6,7 +6,7 @@ import { useAppContext } from "../../context/appContext";
 import "./PlanetInputs.css";
 import { v4 as uuidv4 } from "uuid";
 import Arrow from "../../utils/Arrow";
-import arrowIcon from "../../assets/right-arrow.png";
+
 interface Planet {
   id: string;
   orbitRadius: number;
@@ -44,7 +44,6 @@ const PlanetInputs: React.FC = () => {
     cleanTempPlanet,
     preview,
     setPreview,
-    mouseInactive,
     addSatellites,
     setAddSatellites,
     saveSatellite,
@@ -66,7 +65,6 @@ const PlanetInputs: React.FC = () => {
   };
   const [planetData, setPlanetData] = useState<Planet>(initialPlanet);
   const [isSun, setIsSun] = useState<boolean>(false);
-  const screenHeight = window.innerHeight;
   const minDistance = addSatellites ? 10 : 50;
   const maxDistance = addSatellites ? 100 : 2000;
   const minRadius = addSatellites ? 1 : 10;
@@ -216,8 +214,6 @@ const PlanetInputs: React.FC = () => {
     return hexColorCode;
   }
 
-  const handleToggle = (e: Event) => {};
-
   return (
     <>
       <Container show={showPlanetInput}>
@@ -328,13 +324,6 @@ const PlanetInputs: React.FC = () => {
             Cancel
           </Button>
         </form>
-        <ArrowBtn
-          onClick={(e) => {
-            handleToggle(e);
-          }}
-        >
-          <ArrowImg src={arrowIcon} />
-        </ArrowBtn>
         <Arrow />
       </Container>
     </>
@@ -395,26 +384,4 @@ const Info = styled.p`
 const Button = styled.button`
   margin-top: 20px;
 `;
-
-const ArrowBtn = styled.div`
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  position: absolute;
-  top: 20px;
-  left: 290px;
-  z-index: 999;
-  transition: all 1s ease;
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8.3px);
-  -webkit-backdrop-filter: blur(8.3px);
-  width: 20px;
-  height: 40px;
-  padding-left: 5px;
-`;
-const ArrowImg = styled.img`
-  margin-top: 12.5px;
-  width: 15px;
-`;
-
 export default PlanetInputs;

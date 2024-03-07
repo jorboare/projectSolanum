@@ -7,20 +7,11 @@ import { useAppContext } from "../../context/appContext";
 import "./PlanetsList.css";
 import PlanetGenerator from "../PlanetGenerator/PlanetGenerator";
 
-interface Satellite {
-  radius: number;
-  distance: number;
-  color: string;
-  pattern: string;
-  numPlanets: number;
-}
-
 interface ContainerProps {
   show: boolean;
 }
 interface SatContainerProps {
   show: boolean;
-  visible: boolean;
   numPlanets: number;
 }
 
@@ -31,21 +22,9 @@ const PlanetsList: React.FC = () => {
     selectPlanet,
     handleOrbits,
     setMouseInactive,
-    mouseInactive,
-    deletePlanets,
-    deselectPlanet,
     selectedPlanets,
-    addSatellites,
-    setAddSatellites,
-    hightContrast,
-    setHightContrast,
-    setDemo,
-    setFollowedPlanet,
-    followedPlanet,
-    setMapState,
     showPlanetList,
   } = useAppContext();
-  const [fullScreen, setFullScreen] = useState(false);
   const handleClick = (id: string) => {
     selectPlanet(id);
   };
@@ -85,12 +64,6 @@ const PlanetsList: React.FC = () => {
     }
   }, [selectedPlanets]);
 
-  const handleReset = () => {
-    cleanState();
-  };
-  const showOrbits = () => {
-    handleOrbits();
-  };
   //@ts-ignore
   const handleFullScreen = () => {
     if (
@@ -99,7 +72,6 @@ const PlanetsList: React.FC = () => {
       document.webkitFullscreenElement ||
       document.msFullscreenElement
     ) {
-      setFullScreen(false);
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.mozCancelFullScreen) {
@@ -110,7 +82,6 @@ const PlanetsList: React.FC = () => {
         document.msExitFullscreen();
       }
     } else {
-      setFullScreen(true);
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
       } else if (document.documentElement.mozRequestFullScreen) {
@@ -121,20 +92,6 @@ const PlanetsList: React.FC = () => {
         document.documentElement.msRequestFullscreen();
       }
     }
-  };
-
-  const unSelectPlanets = () => {
-    setShowSatellites(false);
-    setTimeout(() => {
-      deselectPlanet();
-    }, 300);
-  };
-
-  const resetValue = () => {
-    setMapState({
-      scale: 0.5,
-      translation: { x: window.innerWidth / 2, y: window.innerHeight / 4 },
-    });
   };
 
   return (

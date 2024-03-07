@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useRef, useEffect, useContext } from "react";
+import { useRef } from "react";
 import { useAppContext } from "../../context/appContext";
 
 interface PlanetProps {
@@ -41,23 +41,6 @@ const PlanetGenerator: React.FC<PlanetGeneratorProps> = ({
 
   const { selectedPlanets } = useAppContext();
 
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     if (
-  //       (planetRef.current &&
-  //         !planetRef.current.contains(event.target as Node)) ||
-  //       (deletePlanetRef.current &&
-  //         !deletePlanetRef.current.contains(event.target as Node))
-  //     ) {
-  //       deselectPlanet();
-  //     }
-  //   };
-
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
   return (
     <Planet
       ref={planetRef}

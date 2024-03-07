@@ -2,23 +2,6 @@ import { useEffect, useRef, memo } from "react";
 import "./Satellites.css";
 import { useAppContext } from "../../context/appContext";
 import styled from "styled-components";
-
-interface ContornoProps {
-  radius: number;
-  size?: number;
-}
-
-interface SatelliteSchema {
-  id: string;
-  planetRadius: number;
-  distance: number;
-  color: string;
-  pattern: string;
-  speed: number;
-  initialAngle: number;
-  radius: number;
-}
-
 interface SatelliteCompProps {
   radius: number;
   color: string;
@@ -37,8 +20,7 @@ interface SatelliteProps {
 }
 
 const Satellite = (props: SatelliteProps) => {
-  const { planetsNumber, preview, orbits, tempPlanet, hightContrast } =
-    useAppContext();
+  const { planetsNumber, orbits, hightContrast } = useAppContext();
   const movingElementRef = useRef(null);
   const { planetRadius, distance, color, speed, initialAngle } = props.data; //TO DO: Create interface
 
@@ -135,46 +117,7 @@ const SatelliteBody = styled.div<SatelliteCompProps>`
     props.hightContrast ? "transparent" : props.color || "blue"};
   border-radius: 50%;
   transition: all 0.5s ease;
-  border: ${(props) =>
-    props.selected || props.hightContrast ? "3px solid white" : ""};
+  border: ${(props) => (props.hightContrast ? "3px solid white" : "")};
 `;
-
-const Sat = styled.div`
-  position: absolute;
-  width: ${(props) => props.radius + "px" || "100px"};
-  height: ${(props) => props.radius + "px" || "100px"};
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: ${(props) => props.color || "blue"};
-  border-radius: 50%;
-  overflow: hidden;
-  transition: all 0.5s ease;
-`;
-
-// const Contorno = styled.div<ContornoProps>`
-//   position: absolute;
-//   width: 100px;
-//   height: 100px;
-//   top: 50%;
-//   left: 50%;
-//   transform: translate(-50%, -50%);
-//   border: ${(props) =>
-//     props.radius
-//       ? `${props.radius / 2}px solid rgba(0, 0, 0, 0.8)`
-//       : "50px solid rgba(0, 0, 0, 0.8)"};
-//   border-radius: 50%;
-//   filter: blur(20px);
-//   transition: all 0.5s ease;
-//   &:hover {
-//     position: absolute;
-//     width: ${(props) => `${props.radius / 2}px` || "100px"};
-//     height: ${(props) => `${props.radius / 2}px` || "100px"};
-//     top: 50%;
-//     left: 50%;
-//     border: 75px solid rgba(0, 0, 0, 1);
-//     filter: blur(20px);
-//   }
-// `;
 
 export default memo(Satellite);
