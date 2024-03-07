@@ -82,6 +82,8 @@ interface AppContextType {
   resetMapState: () => void;
   showPlanetList: boolean;
   setShowPlanetList: (show: boolean) => void;
+  showPlanetInput: boolean;
+  setShowPlanetInput: (show: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -106,7 +108,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         satellites: [
           {
             id: "1a",
-            color: "#ff9d00",
+            color: "#c07600",
             orbitRadius: 100,
             planetRadius: 40,
             distance: 40,
@@ -118,7 +120,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           },
           {
             id: "1b",
-            color: "#e31e00",
+            color: "#ac1700",
             orbitRadius: 100,
             planetRadius: 40,
             distance: 40,
@@ -132,7 +134,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       },
       {
         id: "2",
-        color: "#035d00",
+        color: "#024600",
         orbitRadius: 656,
         planetRadius: 50,
         distance: 300,
@@ -143,7 +145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         satellites: [
           {
             id: "2a",
-            color: "#818181",
+            color: "#5c5c5c",
             orbitRadius: 100,
             planetRadius: 10,
             distance: 40,
@@ -157,7 +159,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       },
       {
         id: "3",
-        color: "#443f63",
+        color: "#34304c",
         orbitRadius: 656,
         planetRadius: 40,
         distance: 370,
@@ -168,7 +170,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         satellites: [
           {
             id: "3a",
-            color: "#ea652b",
+            color: "#8b3b19",
             orbitRadius: 100,
             planetRadius: 10,
             distance: 40,
@@ -182,7 +184,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       },
       {
         id: "4",
-        color: "#7dc978",
+        color: "#446c41",
         orbitRadius: 656,
         planetRadius: 60,
         distance: 550,
@@ -194,7 +196,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       },
       {
         id: "5",
-        color: "#61f7ff",
+        color: "#399095",
         orbitRadius: 656,
         planetRadius: 53,
         distance: 670,
@@ -237,6 +239,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const [angles, setAngles] = useState({});
   const [showPlanetList, setShowPlanetList] = useState<boolean>(false);
+  const [showPlanetInput, setShowPlanetInput] = useState<boolean>(false);
 
   useEffect(() => {
     localStorage.setItem("appState", JSON.stringify(state));
@@ -384,6 +387,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         resetMapState,
         showPlanetList,
         setShowPlanetList,
+        showPlanetInput,
+        setShowPlanetInput,
       }}
     >
       {children}

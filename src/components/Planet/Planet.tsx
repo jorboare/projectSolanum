@@ -61,7 +61,6 @@ const Planet = (props: PlanetProps) => {
     planetsNumber,
     preview,
     orbits,
-    tempPlanet,
     selectedPlanets,
     hightContrast,
     setPositions,
@@ -69,11 +68,8 @@ const Planet = (props: PlanetProps) => {
     setFollowedPlanet,
   } = useAppContext();
   const movingElementRef = useRef(null);
-
-  const [planetsPos, setPlanetsPos] = useState<PlanetsPositionObject>();
-
   const { planetRadius, distance, color, speed, initialAngle, id, satellites } =
-    props.data; //TO DO: Create interface
+    props.data;
 
   useEffect(() => {
     const movingElement: any = movingElementRef.current;
@@ -204,7 +200,7 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   filter: ${(props) => (props.sun ? "blur(40px)" : "")};
   background-color: ${(props) =>
     props.hightContrast ? "transparent" : props.color || "blue"};
-  z-index: ${(props) => (props.sun ? 400 : 0)};
+  z-index: ${(props) => (props.sun ? 0 : 400)};
 `;
 
 // const Sat = styled.div`

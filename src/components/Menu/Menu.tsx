@@ -33,7 +33,7 @@ const buttons = {
     { name: "Reset View", icon: ResetView, action: "resetView" },
   ],
   planetsMenuGeneral: [
-    { name: "Add new planet", icon: NewPlanet, action: "showPlanets" },
+    { name: "Add new planet", icon: NewPlanet, action: "newPlanet" },
     { name: "Reset", icon: ResetIcon, action: "resetPlanets" },
   ],
   planetsMenuSelection: [
@@ -70,6 +70,8 @@ const Menu = () => {
     resetMapState,
     showPlanetList,
     setShowPlanetList,
+    showPlanetInput,
+    setShowPlanetInput,
   } = useAppContext();
 
   const followPlanet = () => {
@@ -81,6 +83,7 @@ const Menu = () => {
     switch (action) {
       case "showPlanets":
         setShowPlanetList(!showPlanetList);
+        if (showPlanetList) setOpenedMenu("Planets");
         break;
       case "resetPlanets":
         cleanState();
@@ -100,22 +103,50 @@ const Menu = () => {
       case "followPlanet":
         followPlanet();
         break;
+      case "newPlanet":
+        setShowPlanetInput(!showPlanetInput);
+        if (!showPlanetInput) setOpenedMenu("Inputs");
+        break;
       default:
         return;
     }
   };
 
-  const [openHorizontalMenu, setOpenMenu] = useState(false);
+  const [openHorizontalMenu, setOpenHorizontalMenu] = useState(false);
   const [menuButtons, setMenuButtons] = useState(buttons.generalMenu);
+  const [openedMenu, setOpenedMenu] = useState("");
+
+  useEffect(() => {
+    switch (openedMenu) {
+      case "Inputs":
+        console.log("Inputs");
+        setOpenHorizontalMenu(false);
+        setShowPlanetList(false);
+        break;
+      case "Planets":
+        setShowPlanetInput(false);
+        break;
+      case "General":
+        setShowPlanetList(false);
+        setShowPlanetInput(false);
+        break;
+      default:
+        return;
+    }
+  }, [openedMenu]);
 
   const handleMenuClick = () => {
     if (showPlanetList) {
-      setOpenMenu(!openHorizontalMenu);
+      setOpenHorizontalMenu(false);
       setShowPlanetList(!showPlanetList);
       if (showPlanetList) deselectPlanet();
+    } else if (showPlanetInput) {
+      setShowPlanetInput(!showPlanetInput);
+      setOpenHorizontalMenu(false);
     } else {
       setMenuButtons(buttons.generalMenu);
-      setOpenMenu(!openHorizontalMenu);
+      setOpenHorizontalMenu(!openHorizontalMenu);
+      setOpenedMenu("General");
     }
   };
 
@@ -139,10 +170,10 @@ const Menu = () => {
   }, [selectedPlanets]);
 
   const horizontalMenuHandler = (newButtons: any, reopen: boolean) => {
-    setOpenMenu(false);
+    setOpenHorizontalMenu(false);
     setTimeout(() => {
       setMenuButtons(newButtons);
-      setOpenMenu(reopen);
+      setOpenHorizontalMenu(reopen);
     }, 500);
   };
   return (

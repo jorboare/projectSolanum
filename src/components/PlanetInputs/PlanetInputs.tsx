@@ -36,79 +36,6 @@ interface ContainerProps {
   show: boolean;
 }
 
-const Container = styled.div<ContainerProps>`
-  border-radius: 20px;
-  position: absolute;
-  top: 20px;
-  left: 0;
-  z-index: 999;
-  padding: 20px;
-  opacity: ${(props) => (props.show ? "1" : "0")};
-  transition: all 1s ease;
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8.3px);
-  -webkit-backdrop-filter: blur(8.3px);
-  margin: 10px 0 0 20px;
-  width: 250px;
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 0;
-`;
-
-const Icon = styled.div`
-  width: 100%;
-  color: black;
-  text-align: center;
-  &::before {
-    content: "\\2726";
-    font-size: 25px;
-    opacity: 0.6;
-  }
-`;
-
-const Label = styled.label`
-  margin-top: 10px;
-`;
-
-const Slider = styled.input`
-  width: 90%;
-  display: inline;
-`;
-
-const Info = styled.p`
-  display: inline;
-  margin-left: 10px;
-`;
-
-const Button = styled.button`
-  margin-top: 20px;
-`;
-
-const ArrowBtn = styled.div`
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  position: absolute;
-  top: 20px;
-  left: 290px;
-  z-index: 999;
-  transition: all 1s ease;
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8.3px);
-  -webkit-backdrop-filter: blur(8.3px);
-  width: 20px;
-  height: 40px;
-  padding-left: 5px;
-`;
-const ArrowImg = styled.img`
-  margin-top: 12.5px;
-  width: 15px;
-`;
-
 const PlanetInputs: React.FC = () => {
   const {
     state,
@@ -122,6 +49,8 @@ const PlanetInputs: React.FC = () => {
     setAddSatellites,
     saveSatellite,
     setSun,
+    showPlanetInput,
+    setShowPlanetInput,
   } = useAppContext();
   const initialPlanet = {
     id: uuidv4(),
@@ -139,7 +68,7 @@ const PlanetInputs: React.FC = () => {
   const [isSun, setIsSun] = useState<boolean>(false);
   const screenHeight = window.innerHeight;
   const minDistance = addSatellites ? 10 : 50;
-  const maxDistance = addSatellites ? 100 : (screenHeight * 0.8) / 2;
+  const maxDistance = addSatellites ? 100 : 2000;
   const minRadius = addSatellites ? 1 : 10;
   const maxRadius = isSun ? 150 : addSatellites ? 10 : 50;
 
@@ -293,7 +222,7 @@ const PlanetInputs: React.FC = () => {
 
   return (
     <>
-      <Container show={!mouseInactive}>
+      <Container show={showPlanetInput}>
         <Icon></Icon>
         {addSatellites && <p>Satellite</p>}
         <form onSubmit={(e) => (isSun ? handleSunSubmit(e) : handleSubmit(e))}>
@@ -394,6 +323,12 @@ const PlanetInputs: React.FC = () => {
           <Button type="button" onClick={handleRandom}>
             Randomize
           </Button>
+          <Button
+            type="button"
+            onClick={() => setShowPlanetInput(!showPlanetInput)}
+          >
+            Cancel
+          </Button>
         </form>
         <ArrowBtn
           onClick={(e) => {
@@ -407,5 +342,81 @@ const PlanetInputs: React.FC = () => {
     </>
   );
 };
+
+const Container = styled.div<ContainerProps>`
+  border-radius: 50px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1;
+  padding: 20px;
+  opacity: ${(props) => (props.show ? "1" : "0")};
+  transition: all 1s ease;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
+  margin: 10px 0 0 20px;
+  width: ${(props) => (props.show ? "250px" : "50px")};
+  height: ${(props) => (props.show ? "600px" : "50px")};
+  overflow: hidden;
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 0;
+`;
+
+const Icon = styled.div`
+  width: 100%;
+  color: black;
+  text-align: center;
+  &::before {
+    content: "\\2726";
+    font-size: 25px;
+    opacity: 0.6;
+  }
+`;
+
+const Label = styled.label`
+  margin-top: 10px;
+`;
+
+const Slider = styled.input`
+  width: 90%;
+  display: inline;
+  height: 10px;
+`;
+
+const Info = styled.p`
+  display: inline;
+  margin-left: 10px;
+`;
+
+const Button = styled.button`
+  margin-top: 20px;
+`;
+
+const ArrowBtn = styled.div`
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  position: absolute;
+  top: 20px;
+  left: 290px;
+  z-index: 999;
+  transition: all 1s ease;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
+  width: 20px;
+  height: 40px;
+  padding-left: 5px;
+`;
+const ArrowImg = styled.img`
+  margin-top: 12.5px;
+  width: 15px;
+`;
 
 export default PlanetInputs;
