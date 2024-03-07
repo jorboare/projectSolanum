@@ -12,6 +12,7 @@ interface Satellite {
   distance: number;
   color: string;
   pattern: string;
+  numPlanets: number;
 }
 
 interface ContainerProps {
@@ -20,6 +21,7 @@ interface ContainerProps {
 interface SatContainerProps {
   show: boolean;
   visible: boolean;
+  numPlanets: number;
 }
 
 const PlanetsList: React.FC = () => {
@@ -51,6 +53,8 @@ const PlanetsList: React.FC = () => {
   let mouseTimer: NodeJS.Timeout | null = null;
   4;
   const [showSatellites, setShowSatellites] = useState(false);
+  const [satellites, setSatellites] = useState<any[]>([]);
+  const [selPlanetIndex, setSelPlanetIndex] = useState<number>(0);
   const handleMouseMove = () => {
     setMouseInactive(false);
     if (mouseTimer) {
@@ -67,7 +71,19 @@ const PlanetsList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setShowSatellites(selectedPlanets.length === 1);
+    if (selectedPlanets.length === 1) {
+      const planet = state.planets.filter(
+        (p) => selectedPlanets[0] === p.id
+      )[0];
+      const index = state.planets.findIndex((p) => selectedPlanets[0] === p.id);
+      setSelPlanetIndex(index);
+      setSatellites(planet.satellites.map((e) => e));
+      setShowSatellites(selectedPlanets.length === 1);
+    } else {
+      console.log(satellites);
+      setShowSatellites(false);
+      setSatellites([]);
+    }
   }, [selectedPlanets]);
 
   const handleReset = () => {
@@ -124,21 +140,20 @@ const PlanetsList: React.FC = () => {
 
   return (
     <>
-      <SatContainer show={!mouseInactive} visible={showSatellites}>
-        {state.planets.map((p) => {
-          if (selectedPlanets[0] === p.id) {
-            if (p.satellites.length)
-              return p.satellites.map((s) => (
-                <PlanetGenerator
-                  key={s.id}
-                  color={s.color}
-                  onClick={() => handleClick(s.id)}
-                  id={s.id}
-                />
-              ));
-          }
-        })}
-        <button onClick={() => setShowSatellites(false)}>Hide</button>
+      <SatContainer
+        show={showSatellites && satellites.length > 0}
+        numPlanets={selPlanetIndex}
+      >
+        {satellites &&
+          satellites.map((s) => (
+            <PlanetGenerator
+              key={s.id}
+              color={s.color}
+              onClick={() => handleClick(s.id)}
+              id={s.id}
+              size={40}
+            />
+          ))}
       </SatContainer>
       <Container show={showPlanetList}>
         {state.planets
@@ -204,7 +219,7 @@ const Container = styled.div<ContainerProps>`
   bottom: 20px;
   right: 20px;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: center;
   justify-content: space-evenly;
   padding: ${(props) => (props.show ? "20px 0 120px 0" : "0")};
@@ -214,28 +229,25 @@ const Container = styled.div<ContainerProps>`
   z-index: 100;
 `;
 const SatContainer = styled.div<SatContainerProps>`
-  height: ${(props) => (props.visible ? "100px" : "0px")};
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.4);
+  width: ${(props) => (props.show ? "100px" : "0px")};
+  height: ${(props) => (props.show ? "auto" : "0px")};
+  background: rgba(255, 255, 255, 0.6);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8.3px);
   -webkit-backdrop-filter: blur(8.3px);
-  border-radius: 20px;
+  border-radius: 50px;
   position: absolute;
-  bottom: 160px;
-  left: 0;
-  z-index: 500;
+  bottom: ${(props) =>
+    `${props.numPlanets ? props.numPlanets * 70 + 130 : 130}px`};
+  right: 130px;
   display: flex;
+  flex-direction: column-reverse;
   align-items: center;
   justify-content: space-evenly;
+  padding: ${(props) => (props.show ? "20px 0 20px 0" : "0")};
   opacity: ${(props) => (props.show ? "1" : "0")};
-  transition: all 0.3s ease;
-  margin: 0 5% 20px 5%;
-  padding: ${(props) => (props.visible ? "10px 0px 10px 10px" : "0px")};
-  & > * {
-    margin-right: 10px;
-    height: ${(props) => (props.visible ? "30px" : "0px")};
-    width: ${(props) => (props.visible ? "30px" : "0px")};
-  }
+  gap: 20px;
+  transition: all 0.5s ease, bottom 0ms ease;
+  z-index: 100;
 `;
 export default PlanetsList;

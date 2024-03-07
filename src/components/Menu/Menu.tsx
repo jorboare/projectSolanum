@@ -10,6 +10,9 @@ import OrbitsIcon from "../../assets/Icons/Orbits.png";
 import HighContrast from "../../assets/Icons/HighContrast.png";
 import Demo from "../../assets/Icons/Demo.png";
 import ResetView from "../../assets/Icons/ResetView.png";
+import NewPlanet from "../../assets/Icons/NewPlanet.png";
+import NewSatellite from "../../assets/Icons/AddSatellite.png";
+import FollowPlanet from "../../assets/Icons/Follow.png";
 interface MenuDisplayed {
   open: boolean;
   idx?: number;
@@ -17,18 +20,33 @@ interface MenuDisplayed {
   size?: string;
 }
 
-const icons = [
-  { name: "Planets", icon: PlanetIcon, action: "showPlanets" },
-  { name: "Reset", icon: ResetIcon, action: "resetPlanets" },
-  { name: "Orbits", icon: OrbitsIcon, action: "showOrbits" },
-  {
-    name: "High contrast",
-    icon: HighContrast,
-    action: "highContrastMode",
-  },
-  { name: "Demo", icon: Demo, action: "showDemo" },
-  { name: "Reset View", icon: ResetView, action: "resetView" },
-];
+const buttons = {
+  generalMenu: [
+    { name: "Planets", icon: PlanetIcon, action: "showPlanets" },
+    { name: "Orbits", icon: OrbitsIcon, action: "showOrbits" },
+    {
+      name: "High contrast",
+      icon: HighContrast,
+      action: "highContrastMode",
+    },
+    { name: "Demo", icon: Demo, action: "showDemo" },
+    { name: "Reset View", icon: ResetView, action: "resetView" },
+  ],
+  planetsMenuGeneral: [
+    { name: "Add new planet", icon: NewPlanet, action: "showPlanets" },
+    { name: "Reset", icon: ResetIcon, action: "resetPlanets" },
+  ],
+  planetsMenuSelection: [
+    { name: "Edit", icon: PlanetIcon, action: "showPlanets" },
+    { name: "Delete", icon: ResetIcon, action: "resetPlanets" },
+    { name: "Follow", icon: FollowPlanet, action: "followPlanet" },
+    { name: "Add satellite", icon: NewSatellite, action: "resetPlanets" },
+  ],
+  planetsMenuMultiSelection: [
+    { name: "Edit", icon: PlanetIcon, action: "showPlanets" },
+    { name: "Delete", icon: ResetIcon, action: "resetPlanets" },
+  ],
+};
 
 const Menu = () => {
   const {
@@ -54,6 +72,11 @@ const Menu = () => {
     setShowPlanetList,
   } = useAppContext();
 
+  const followPlanet = () => {
+    if (followedPlanet) {
+      setFollowedPlanet(null);
+    } else setFollowedPlanet(selectedPlanets[0]);
+  };
   const handleClick = (action: string) => {
     switch (action) {
       case "showPlanets":
@@ -74,38 +97,71 @@ const Menu = () => {
       case "resetView":
         resetMapState();
         break;
+      case "followPlanet":
+        followPlanet();
+        break;
       default:
         return;
     }
   };
 
-  const [openMenu, setOpenMenu] = useState(false);
+  const [openHorizontalMenu, setOpenMenu] = useState(false);
+  const [menuButtons, setMenuButtons] = useState(buttons.generalMenu);
 
   const handleMenuClick = () => {
     if (showPlanetList) {
+      setOpenMenu(!openHorizontalMenu);
       setShowPlanetList(!showPlanetList);
+      if (showPlanetList) deselectPlanet();
     } else {
-      setOpenMenu(!openMenu);
+      setMenuButtons(buttons.generalMenu);
+      setOpenMenu(!openHorizontalMenu);
     }
   };
 
   useEffect(() => {
-    if (showPlanetList && openMenu) setOpenMenu(!openMenu);
+    if (showPlanetList && openHorizontalMenu) {
+      horizontalMenuHandler(buttons.planetsMenuGeneral, true);
+    } else {
+      horizontalMenuHandler(buttons.generalMenu, false);
+    }
   }, [showPlanetList]);
+
+  useEffect(() => {
+    if (selectedPlanets.length === 1) {
+      horizontalMenuHandler(buttons.planetsMenuSelection, true);
+    } else if (selectedPlanets.length > 1) {
+      if (menuButtons != buttons.planetsMenuMultiSelection)
+        horizontalMenuHandler(buttons.planetsMenuMultiSelection, true);
+    } else if (showPlanetList) {
+      horizontalMenuHandler(buttons.planetsMenuGeneral, true);
+    }
+  }, [selectedPlanets]);
+
+  const horizontalMenuHandler = (newButtons: any, reopen: boolean) => {
+    setOpenMenu(false);
+    setTimeout(() => {
+      setMenuButtons(newButtons);
+      setOpenMenu(reopen);
+    }, 500);
+  };
   return (
     <>
-      <MenuContainer open={openMenu}>
-        <IconContainer onClick={() => handleMenuClick()} open={openMenu}>
+      <MenuContainer open={openHorizontalMenu}>
+        <IconContainer
+          onClick={() => handleMenuClick()}
+          open={openHorizontalMenu}
+        >
           <HamburguerIcon
-            open={openMenu}
+            open={openHorizontalMenu}
             planetList={showPlanetList}
           ></HamburguerIcon>
         </IconContainer>
       </MenuContainer>
-      <MenuDisplayed open={openMenu}>
-        {icons.map((e, idx) => (
+      <MenuDisplayed open={openHorizontalMenu}>
+        {menuButtons.map((e, idx) => (
           <MenuButtons
-            open={openMenu}
+            open={openHorizontalMenu}
             idx={idx}
             src={e.icon}
             key={idx}
@@ -122,8 +178,8 @@ const MenuContainer = styled.div<MenuDisplayed>`
   bottom: 20px;
   right: 20px;
   height: 100px;
-  width: ${(props) => (props.open ? "600px" : "100px")};
-  border-radius: ${(props) => (props.open ? "50px 50px 50px 50px" : "50px")};
+  width: 100px;
+  border-radius: 50px;
   background: rgba(255, 255, 255, 0.6);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8.3px);
@@ -173,11 +229,12 @@ const HamburguerIcon = styled.div<MenuDisplayed>`
     bottom: ${(props) =>
       props.open ? "50%" : props.planetList ? "50%" : "55%"};
     transform: ${(props) =>
-      props.open
-        ? "rotate(45deg)"
-        : props.planetList
+      props.planetList
         ? "rotate(135deg)"
+        : props.open
+        ? "rotate(45deg)"
         : "rotate(0deg)"};
+
     height: 2px;
     width: ${(props) => (props.planetList ? "20px" : "40px")};
     margin-left: ${(props) => (props.planetList ? "17px" : "")};
@@ -187,10 +244,10 @@ const HamburguerIcon = styled.div<MenuDisplayed>`
     bottom: ${(props) =>
       props.open ? "50%" : props.planetList ? "50%" : "42%"};
     transform: ${(props) =>
-      props.open
-        ? "rotate(135deg)"
-        : props.planetList
+      props.planetList
         ? "rotate(45deg)"
+        : props.open
+        ? "rotate(135deg)"
         : "rotate(0deg)"};
     height: 2px;
     width: ${(props) => (props.planetList ? "20px" : "40px")};
@@ -199,33 +256,33 @@ const HamburguerIcon = styled.div<MenuDisplayed>`
 `;
 
 const MenuDisplayed = styled.div<MenuDisplayed>`
-  visibility: ${(props) => (props.open ? "visible" : "hidden")};
   position: absolute;
   bottom: 20px;
-  right: 120px;
+  right: 20px;
   height: 100px;
-  width: ${(props) => (props.open ? "520px" : "0px")};
+  width: ${(props) => (props.open ? "auto" : "50px")};
   border-radius: ${(props) => (props.open ? "25px 0 0 25px" : "25px 0 0 25px")};
-  z-index: 200;
-  transition: all 0.5s ease-in-out;
+  z-index: 0;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 20px;
+  border-radius: ${(props) => (props.open ? "50px 50px 50px 50px" : "50px")};
+  padding: ${(props) => (props.open ? "0px 120px 0px 20px" : "0")};
+  opacity: ${(props) => (props.open ? "1" : "0")};
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8.3px);
+  -webkit-backdrop-filter: blur(8.3px);
+  transition: all 0.5s ease;
 `;
 
 const MenuButtons = styled.img<MenuDisplayed>`
-  position: absolute;
-  top: 50%;
-  right: 0px;
   width: 60px;
   filter: invert(1);
-  transform: translateY(-50%)
-    ${(props) =>
-      props.open
-        ? `translateX(${-420 + props.idx * (60 + 20)}px)`
-        : "translateX(50px)"};
   opacity: ${(props) => (props.open ? "1" : "0")};
-  transition: opacity 0.3s ease, transform 0.4s ease;
-  transition-delay: ${(props) =>
-    (props.open ? 300 + props.idx * 100 : props.idx * -100) + "ms"};
+  transition: all 0.5 ease;
   cursor: pointer;
 
   &:hover {

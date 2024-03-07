@@ -95,7 +95,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     planets: [
       {
         id: "1",
-        color: "#4458dc",
+        color: "",
         orbitRadius: 656,
         planetRadius: 0,
         distance: 150,
@@ -258,7 +258,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } else deselectPlanet(id);
   };
 
-  const deselectPlanet = (id: string | undefined) => {
+  const deselectPlanet = (id?: string) => {
     if (id) {
       const index = selectedPlanets.findIndex((e) => e === id);
       const newSelectedPlanets = [...selectedPlanets];

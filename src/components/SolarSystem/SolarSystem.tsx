@@ -15,6 +15,7 @@ const SolarContainer = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
 const SolarSystem = () => {
   const {
     state,
@@ -45,7 +46,7 @@ const SolarSystem = () => {
       >
         <SolarContainer>
           {tempPlanet && <Planet data={tempPlanet} order={-100} />}
-          {sun && <Planet data={sun} />}
+          {sun && <Planet data={sun} sun={true} />}
           {state.planets &&
             state.planets.map((e, idx) => (
               <Planet key={idx} data={e} order={idx} />

@@ -43,6 +43,7 @@ interface OrbitProps {
 interface PlanetProps {
   order?: number;
   data: any;
+  sun?: boolean;
   onClick?: () => void; // Añadir la propiedad onClick
 }
 
@@ -94,9 +95,6 @@ const Planet = (props: PlanetProps) => {
     angle -= 90;
     function update() {
       angle += orbitSpeed;
-      if (Math.round(angle) + 90 === 360) {
-        angle = -90;
-      }
       const x = Math.cos((angle * Math.PI) / 180) * orbitRadius;
       const y = Math.sin((angle * Math.PI) / 180) * orbitRadius;
 
@@ -105,12 +103,9 @@ const Planet = (props: PlanetProps) => {
       }px)`;
 
       if (id === followedPlanet) {
-        const newAngle = (Math.atan2(y, x) * 180) / Math.PI;
-        console.log("new angle ----->", Math.round(newAngle) + 90);
-        console.log("angle ----->", angle + 90);
         setPositions({
-          x: -x * 2 - screen.width / 2 - widthOffset,
-          y: -y * 2 - screen.height / 2 - heightOffset,
+          x: -x * 2 + screen.width / 2 + widthOffset,
+          y: -y * 2 - screen.height / 2 + heightOffset,
         });
       }
 
@@ -133,12 +128,22 @@ const Planet = (props: PlanetProps) => {
             radius={planetRadius}
             selected={selectedPlanets.some((p) => p === id)}
             hightContrast={hightContrast}
+            followedPlanet={followedPlanet ? true : false}
           >
             {satellites.map((s: Satellite, idx: number) => {
               return <Satellite key={idx} data={s}></Satellite>;
             })}
             {/* <Contorno radius={planetRadius} /> */}
           </InnerPlanet>
+          {props.sun && (
+            <InnerPlanet
+              color={color}
+              radius={planetRadius}
+              selected={selectedPlanets.some((p) => p === id)}
+              hightContrast={hightContrast}
+              sun={props.sun}
+            ></InnerPlanet>
+          )}
         </MovingElement>
       </Orbit>
     </>
@@ -174,10 +179,14 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   width: ${(props) =>
     props.hightContrast
       ? props.radius - 5 + "px"
+      : props.sun
+      ? props.radius * 1.5 + "px"
       : props.radius + "px" || "100px"};
   height: ${(props) =>
     props.hightContrast
       ? props.radius - 5 + "px"
+      : props.sun
+      ? props.radius * 1.5 + "px"
       : props.radius + "px" || "100px"};
   top: 50%;
   left: 50%;
@@ -187,9 +196,15 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   border-radius: 50%;
   transition: all 0.5s ease;
   border: ${(props) =>
-    (props.selected || props.hightContrast) && props.radius
+    (props.selected || props.hightContrast) &&
+    props.radius &&
+    !props.followedPlanet
       ? "3px solid white"
       : ""};
+  filter: ${(props) => (props.sun ? "blur(40px)" : "")};
+  background-color: ${(props) =>
+    props.hightContrast ? "transparent" : props.color || "blue"};
+  z-index: ${(props) => (props.sun ? 400 : 0)};
 `;
 
 // const Sat = styled.div`
