@@ -328,7 +328,6 @@ const PlanetInputs: React.FC = () => {
             Cancel
           </Button>
         </form>
-        <PlanetGenerator color={tempPlanet?.color} size={tempPlanet?.size} />
       </Container>
     </>
   );
