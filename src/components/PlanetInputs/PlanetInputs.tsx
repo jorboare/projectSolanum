@@ -5,7 +5,6 @@ import { HuePicker } from "react-color";
 import { useAppContext } from "../../context/appContext";
 import "./PlanetInputs.css";
 import { v4 as uuidv4 } from "uuid";
-import PlanetGenerator from "../PlanetGenerator/PlanetGenerator";
 
 interface Planet {
   id: string;
@@ -50,7 +49,6 @@ const PlanetInputs: React.FC = () => {
     setSun,
     showPlanetInput,
     setShowPlanetInput,
-    tempPlanet,
   } = useAppContext();
   const initialPlanet = {
     id: uuidv4(),
