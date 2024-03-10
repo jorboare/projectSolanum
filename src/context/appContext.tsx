@@ -203,12 +203,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     ],
   };
 
-  const [state, setState] = useState<AppState>(() => {
-    const savedState = localStorage.getItem("appState");
-    return savedState ? JSON.parse(savedState) : initialAppState;
-  });
-  const [tempPlanet, setTempPlanet] = useState<Planet | undefined>(undefined);
-  const [sun, setSun] = useState<Planet | undefined>({
+  const initialSun = {
     id: "0",
     orbitRadius: 0,
     planetRadius: 80,
@@ -218,6 +213,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     speed: 0,
     initialAngle: 0,
     satellites: [],
+  };
+  const [state, setState] = useState<AppState>(() => {
+    const savedState = localStorage.getItem("appState");
+    return savedState ? JSON.parse(savedState) : initialAppState;
+  });
+  const [tempPlanet, setTempPlanet] = useState<Planet | undefined>(undefined);
+  const [sun, setSun] = useState<Planet>(() => {
+    const savedState = localStorage.getItem("appSun");
+    return savedState ? JSON.parse(savedState) : initialSun;
   });
   const [preview, setPreview] = useState(false);
   const [orbits, setOrbits] = useState(true);
@@ -237,6 +241,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem("appState", JSON.stringify(state));
   }, [state]);
+  useEffect(() => {
+    localStorage.setItem("appSun", JSON.stringify(sun));
+  }, [sun]);
 
   const updateState = (newState: AppState) => {
     console.log("Prev state --->", state);
@@ -337,7 +344,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (e.id === item.id) return item;
       else return e;
     });
-
+    setSun(initialSun);
     setState({ ...initialAppStateDemo, planets: demoCopy });
   };
 

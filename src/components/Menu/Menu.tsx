@@ -211,6 +211,11 @@ const MenuContainer = styled.div<MenuDisplayed>`
   display: flex;
   align-items: right;
   justify-content: flex-end;
+
+  @media (max-width: 768px) {
+    width: 50px;
+    height: 50px;
+  }
 `;
 
 const IconContainer = styled.div<MenuDisplayed>`
@@ -224,6 +229,11 @@ const IconContainer = styled.div<MenuDisplayed>`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media (max-width: 768px) {
+    width: 50px;
+    height: 50px;
+  }
 `;
 
 const HamburguerIcon = styled.div<MenuDisplayed>`
@@ -245,6 +255,7 @@ const HamburguerIcon = styled.div<MenuDisplayed>`
     height: 3px;
     background-color: #424242;
     transition: all 0.5s ease;
+    width: ${(props) => (props.planetList ? "20px" : "40px")};
   }
 
   &:after {
@@ -258,7 +269,6 @@ const HamburguerIcon = styled.div<MenuDisplayed>`
         : "rotate(0deg)"};
 
     height: 2px;
-    width: ${(props) => (props.planetList ? "20px" : "40px")};
     margin-left: ${(props) => (props.planetList ? "17px" : "")};
   }
 
@@ -272,8 +282,33 @@ const HamburguerIcon = styled.div<MenuDisplayed>`
         ? "rotate(135deg)"
         : "rotate(0deg)"};
     height: 2px;
-    width: ${(props) => (props.planetList ? "20px" : "40px")};
     margin-left: ${(props) => (props.planetList ? "3px" : "")};
+  }
+
+  @media (max-width: 768px) {
+    width: 20px;
+    &:after,
+    &:before {
+      width: ${(props) => (props.planetList ? "10px" : "20px")};
+      margin: 0;
+    }
+    &:after {
+      transform: ${(props) =>
+        props.planetList
+          ? "rotate(135deg)  translate(-6px, -4px)"
+          : props.open
+          ? "rotate(135deg)"
+          : "rotate(0deg)"};
+    }
+
+    &:before {
+      transform: ${(props) =>
+        props.planetList
+          ? "rotate(45deg) translateY(-2px)"
+          : props.open
+          ? "rotate(45deg)"
+          : "rotate(0deg)"};
+    }
   }
 `;
 
@@ -298,6 +333,12 @@ const MenuDisplayed = styled.div<MenuDisplayed>`
   backdrop-filter: blur(8.3px);
   -webkit-backdrop-filter: blur(8.3px);
   transition: all 0.5s ease;
+
+  @media (max-width: 768px) {
+    height: 50px;
+    gap: 10px;
+    padding: ${(props) => (props.open ? "0px 60px 0px 20px" : "0")};
+  }
 `;
 
 const MenuButtons = styled.img<MenuDisplayed>`
@@ -310,6 +351,11 @@ const MenuButtons = styled.img<MenuDisplayed>`
   &:hover {
     filter: invert(0);
     transition: filter 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    width: 30px;
+    gap: 10px;
   }
 `;
 

@@ -164,6 +164,15 @@ const Container = styled.div<ContainerProps>`
   gap: 20px;
   transition: all 1s ease;
   z-index: 100;
+
+  @media (max-width: 768px) {
+    width: 50px;
+    padding: ${(props) => (props.show ? "20px 0 60px 0" : "0")};
+    & > * {
+      width: 30px;
+      height: 30px;
+    }
+  }
 `;
 const SatContainer = styled.div<SatContainerProps>`
   width: ${(props) => (props.show ? "100px" : "0px")};

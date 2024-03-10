@@ -5,7 +5,7 @@ import { HuePicker } from "react-color";
 import { useAppContext } from "../../context/appContext";
 import "./PlanetInputs.css";
 import { v4 as uuidv4 } from "uuid";
-import Arrow from "../../utils/Arrow";
+import PlanetGenerator from "../PlanetGenerator/PlanetGenerator";
 
 interface Planet {
   id: string;
@@ -50,12 +50,13 @@ const PlanetInputs: React.FC = () => {
     setSun,
     showPlanetInput,
     setShowPlanetInput,
+    tempPlanet,
   } = useAppContext();
   const initialPlanet = {
     id: uuidv4(),
     color: "#ff0000",
-    orbitRadius: addSatellites ? 100 : 200,
-    planetRadius: addSatellites ? 3 : 100,
+    orbitRadius: addSatellites ? 50 : 50,
+    planetRadius: addSatellites ? 3 : 50,
     distance: addSatellites ? 50 : 100,
     pattern: "none",
     speed: addSatellites ? 0.3 : 0.3,
@@ -219,7 +220,10 @@ const PlanetInputs: React.FC = () => {
       <Container show={showPlanetInput}>
         <Icon></Icon>
         {addSatellites && <p>Satellite</p>}
-        <form onSubmit={(e) => (isSun ? handleSunSubmit(e) : handleSubmit(e))}>
+        <form
+          onSubmit={(e) => (isSun ? handleSunSubmit(e) : handleSubmit(e))}
+          onChange={() => updateTempPlanet({ ...planetData, speed: 0.3 })}
+        >
           <Label>{isSun ? "Sun" : "Planet"} Radius</Label>
           <InputContainer>
             <Slider
@@ -324,7 +328,7 @@ const PlanetInputs: React.FC = () => {
             Cancel
           </Button>
         </form>
-        <Arrow />
+        <PlanetGenerator color={tempPlanet?.color} size={tempPlanet?.size} />
       </Container>
     </>
   );
