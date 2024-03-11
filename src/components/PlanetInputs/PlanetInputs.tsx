@@ -222,7 +222,7 @@ const PlanetInputs: React.FC = () => {
       planet.distance > maxDistance.distance ? planet : maxDistance
     );
     let farDistance = farPlanet.distance;
-    if (tempPlanet && tempPlanet?.distance >= farDistance) {
+    if (tempPlanet && tempPlanet?.distance) {
       farDistance = tempPlanet?.distance;
     }
     const minValue = 150;
@@ -237,8 +237,9 @@ const PlanetInputs: React.FC = () => {
           },
         });
       } else {
+        const maxScale = 0.6;
         setMapState({
-          scale: newScale,
+          scale: newScale >= maxScale ? maxScale : newScale,
           translation: {
             x: window.innerWidth / 2,
             y: window.innerHeight / 5,
