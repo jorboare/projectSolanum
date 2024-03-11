@@ -86,10 +86,27 @@ const Planet = (props: PlanetProps) => {
       }px)`;
 
       if (id === followedPlanet) {
+        // console.log("screen.width ---->", screen.width);
+        // console.log("screen.height ---->", screen.height);
+        // console.log("pos ---->", {
+        //   x: -x - screen.width,
+        //   y: -y - screen.height,
+        // });
+        //works for scale: 3
+        // setPositions({
+        //   x: -x * 3 - screen.width - widthOffset,
+        //   y: -y * 3 - screen.height - heightOffset,
+        // });
+        // This works for scale: 1
         setPositions({
-          x: -x * 2 + screen.width / 2 + widthOffset,
-          y: -y * 2 - screen.height / 2 + heightOffset,
+          x: -x + screen.width / 2,
+          y: -y,
         });
+        // This works for scale: 2
+        // setPositions({
+        //   x: -x * 2 - screen.width / 2 - widthOffset,
+        //   y: -y * 2 - screen.height / 2 - heightOffset,
+        // });
       }
 
       requestAnimationFrame(update);

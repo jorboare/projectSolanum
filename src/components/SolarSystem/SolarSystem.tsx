@@ -30,7 +30,7 @@ const SolarSystem = () => {
   useEffect(() => {
     if (followedPlanet) {
       setMapState({
-        scale: 2,
+        scale: 1,
         translation: positions,
       });
     }
