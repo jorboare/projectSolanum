@@ -314,10 +314,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const resetMapState = () => {
-    setMapState({
-      scale: 0.5,
-      translation: { x: window.innerWidth / 2, y: window.innerHeight / 4 },
-    });
+    const farPlanet = state.planets.reduce((maxDistance, planet) =>
+      planet.distance > maxDistance.distance ? planet : maxDistance
+    );
+    let farDistance = farPlanet.distance;
+
+    const minValue = 150;
+    const newScale = minValue / farDistance;
+    if (window.innerWidth >= 768) {
+      setMapState({
+        scale: newScale * 2,
+        translation: {
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2.7,
+        },
+      });
+    } else {
+      const maxScale = 0.6;
+      setMapState({
+        scale: newScale >= maxScale ? maxScale : newScale,
+        translation: {
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2.7,
+        },
+      });
+    }
   };
 
   const setDemo = () => {

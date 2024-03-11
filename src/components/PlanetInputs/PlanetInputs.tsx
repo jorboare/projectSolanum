@@ -69,7 +69,7 @@ const PlanetInputs: React.FC = () => {
   const minDistance = addSatellites ? 10 : 50;
   const maxDistance = addSatellites ? 100 : 2000;
   const minRadius = addSatellites ? 1 : 10;
-  const maxRadius = isSun ? 150 : addSatellites ? 10 : 50;
+  const maxRadius = isSun ? 150 : addSatellites ? 10 : 100;
 
   useEffect(() => {
     if (preview) {
@@ -216,8 +216,6 @@ const PlanetInputs: React.FC = () => {
   }
 
   useEffect(() => {
-    state.planets;
-
     const farPlanet = state.planets.reduce((maxDistance, planet) =>
       planet.distance > maxDistance.distance ? planet : maxDistance
     );
