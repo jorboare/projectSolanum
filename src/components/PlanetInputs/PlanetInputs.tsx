@@ -388,6 +388,7 @@ const Container = styled.div<ContainerProps>`
   @media (max-width: 768px) {
     width: ${(props) => (props.show ? `${window.innerWidth - 80}px` : "50px")};
     height: ${(props) => (props.show ? "300px" : "50px")};
+    padding: ${(props) => (props.show ? "20px" : "0px")};
     max-height: 400px;
     margin: 0;
     border-radius: 25px;

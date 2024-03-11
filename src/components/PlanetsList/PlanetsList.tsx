@@ -62,19 +62,6 @@ const PlanetsList: React.FC = () => {
     }
   }, [selectedPlanets]);
 
-  //@ts-ignore
-  const handleFullScreen = () => {
-    if (document.fullscreenElement) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    } else {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-      }
-    }
-  };
-
   return (
     <>
       <SatContainer

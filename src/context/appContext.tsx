@@ -78,6 +78,7 @@ interface AppContextType {
   setShowPlanetList: (show: boolean) => void;
   showPlanetInput: boolean;
   setShowPlanetInput: (show: boolean) => void;
+  handleFullScreen: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -348,6 +349,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState({ ...initialAppStateDemo, planets: demoCopy });
   };
 
+  const handleFullScreen = () => {
+    console.log("fullScreen");
+    if (document.fullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    } else {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      }
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -387,6 +401,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setShowPlanetList,
         showPlanetInput,
         setShowPlanetInput,
+        handleFullScreen,
       }}
     >
       {children}

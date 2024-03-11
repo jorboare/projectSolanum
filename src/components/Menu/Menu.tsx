@@ -31,6 +31,7 @@ const buttons = {
     },
     { name: "Demo", icon: Demo, action: "showDemo" },
     { name: "Reset View", icon: ResetView, action: "resetView" },
+    { name: "Full screen", icon: ResetView, action: "setFullScreen" },
   ],
   planetsMenuGeneral: [
     { name: "Add new planet", icon: NewPlanet, action: "newPlanet" },
@@ -64,6 +65,7 @@ const Menu = () => {
     setShowPlanetList,
     showPlanetInput,
     setShowPlanetInput,
+    handleFullScreen,
   } = useAppContext();
 
   const followPlanet = () => {
@@ -91,6 +93,9 @@ const Menu = () => {
         break;
       case "resetView":
         resetMapState();
+        break;
+      case "setFullScreen":
+        handleFullScreen();
         break;
       case "followPlanet":
         followPlanet();
@@ -347,6 +352,7 @@ const MenuButtons = styled.img<MenuDisplayed>`
   opacity: ${(props) => (props.open ? "1" : "0")};
   transition: all 0.5 ease;
   cursor: pointer;
+  z-index: 1000;
 
   @media (min-width: 768px) {
     &:hover {
