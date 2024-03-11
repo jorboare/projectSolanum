@@ -31,17 +31,20 @@ interface InnerPlanetProps {
   hightContrast: boolean;
   followed?: boolean;
   sun?: boolean;
+  dimension?: boolean;
 }
 
 interface OrbitProps {
   size: number;
   index: number;
   show: boolean;
+  dimension?: boolean;
 }
 interface PlanetProps {
   order?: number;
   data: any;
   sun?: boolean;
+
   onClick?: () => void; // Añadir la propiedad onClick
 }
 
@@ -53,6 +56,7 @@ const Planet = (props: PlanetProps) => {
     hightContrast,
     setPositions,
     followedPlanet,
+    thirdDimension,
   } = useAppContext();
   const movingElementRef = useRef(null);
   const { planetRadius, distance, color, speed, initialAngle, id, satellites } =
@@ -121,6 +125,7 @@ const Planet = (props: PlanetProps) => {
         size={distance}
         index={planetsNumber() - (props.order || 0)}
         show={orbits}
+        dimension={thirdDimension}
       >
         <MovingElement ref={movingElementRef}>
           <InnerPlanet
@@ -129,6 +134,7 @@ const Planet = (props: PlanetProps) => {
             selected={selectedPlanets.some((p) => p === id)}
             hightContrast={hightContrast}
             followed={followedPlanet ? true : false}
+            dimension={thirdDimension}
           >
             {satellites.map((s: Satellite, idx: number) => {
               return <Satellite key={idx} data={s}></Satellite>;
@@ -158,7 +164,11 @@ const Orbit = styled.div<OrbitProps>`
   left: 50%;
   transform: translate(-50%, -50%);
   border: ${(props) =>
-    props.show ? "1px solid rgba(255, 255, 255, 0.5)" : "none"};
+    props.show
+      ? props.dimension
+        ? "2px solid rgba(255, 255, 255, 0.5)"
+        : "1px solid rgba(255, 255, 255, 0.5)"
+      : "none"};
   border-radius: 50%;
   margin: 0 auto;
   transition: all 0.5s ease;
@@ -181,16 +191,23 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
       ? props.radius - 5 + "px"
       : props.sun
       ? props.radius * 1.5 + "px"
+      : props.dimension
+      ? props.radius * 2 + "px"
       : props.radius + "px" || "100px"};
   height: ${(props) =>
     props.hightContrast
       ? props.radius - 5 + "px"
       : props.sun
       ? props.radius * 1.5 + "px"
+      : props.dimension
+      ? props.radius * 2 + "px"
       : props.radius + "px" || "100px"};
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: ${(props) =>
+    props.dimension
+      ? "translate(-50%, -50%) rotateY(-60deg)"
+      : "translate(-50%, -50%)"};
   background-color: ${(props) =>
     props.hightContrast ? "transparent" : props.color || "blue"};
   border-radius: 50%;

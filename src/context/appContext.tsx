@@ -78,6 +78,8 @@ interface AppContextType {
   setShowPlanetList: (show: boolean) => void;
   showPlanetInput: boolean;
   setShowPlanetInput: (show: boolean) => void;
+  setThirdDimension: (dimension: boolean) => void;
+  thirdDimension: boolean;
   handleFullScreen: () => void;
 }
 
@@ -238,6 +240,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const [showPlanetList, setShowPlanetList] = useState<boolean>(false);
   const [showPlanetInput, setShowPlanetInput] = useState<boolean>(false);
+  const [thirdDimension, setThirdDimension] = useState<boolean>(false);
 
   useEffect(() => {
     localStorage.setItem("appState", JSON.stringify(state));
@@ -423,6 +426,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         showPlanetInput,
         setShowPlanetInput,
         handleFullScreen,
+        setThirdDimension,
+        thirdDimension,
       }}
     >
       {children}

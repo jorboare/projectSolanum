@@ -14,6 +14,7 @@ const SolarContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  transform: rotateX(50deg);
 `;
 
 const SolarSystem = () => {
@@ -25,6 +26,8 @@ const SolarSystem = () => {
     followedPlanet,
     mapState,
     setMapState,
+    thirdDimension,
+    setThirdDimension,
   } = useAppContext();
 
   useEffect(() => {
@@ -35,16 +38,19 @@ const SolarSystem = () => {
       });
     }
   }, [positions]);
-
   return (
     <>
+      <button onClick={() => setThirdDimension(!thirdDimension)}>3d</button>
       <MapInteractionCSS
         showControls
         defaultValue={mapState}
         value={mapState}
         onChange={(value: any) => setMapState(value)}
       >
-        <SolarContainer>
+        <SolarContainer
+          id="solarSystem"
+          style={{ transform: thirdDimension ? "rotateX(60deg)" : "none" }}
+        >
           {tempPlanet && <Planet data={tempPlanet} order={-100} />}
           {sun && <Planet data={sun} sun={true} />}
           {state.planets &&
