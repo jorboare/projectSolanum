@@ -348,12 +348,18 @@ const MenuButtons = styled.img<MenuDisplayed>`
   transition: all 0.5 ease;
   cursor: pointer;
 
-  &:hover {
-    filter: invert(0);
-    transition: filter 0.3s ease;
+  @media (min-width: 768px) {
+    &:hover {
+      filter: invert(0);
+      transition: filter 0.1s ease;
+    }
   }
 
   @media (max-width: 768px) {
+    &:active {
+      filter: invert(0);
+      transition: filter 0.3s ease;
+    }
     width: 30px;
     gap: 10px;
   }

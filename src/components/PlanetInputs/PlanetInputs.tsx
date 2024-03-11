@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 //@ts-ignore
-import { HuePicker } from "react-color";
+import { SliderPicker } from "react-color";
 import { useAppContext } from "../../context/appContext";
 import "./PlanetInputs.css";
 import { v4 as uuidv4 } from "uuid";
@@ -49,6 +49,8 @@ const PlanetInputs: React.FC = () => {
     setSun,
     showPlanetInput,
     setShowPlanetInput,
+    setMapState,
+    tempPlanet,
   } = useAppContext();
   const initialPlanet = {
     id: uuidv4(),
@@ -213,6 +215,39 @@ const PlanetInputs: React.FC = () => {
     return hexColorCode;
   }
 
+  useEffect(() => {
+    state.planets;
+
+    const farPlanet = state.planets.reduce((maxDistance, planet) =>
+      planet.distance > maxDistance.distance ? planet : maxDistance
+    );
+    let farDistance = farPlanet.distance;
+    if (tempPlanet && tempPlanet?.distance >= farDistance) {
+      farDistance = tempPlanet?.distance;
+    }
+    const minValue = 150;
+    const newScale = minValue / farDistance;
+    if (showPlanetInput) {
+      if (window.innerWidth >= 768) {
+        setMapState({
+          scale: newScale * 2,
+          translation: {
+            x: window.innerWidth / 3,
+            y: window.innerHeight / 3,
+          },
+        });
+      } else {
+        setMapState({
+          scale: newScale,
+          translation: {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 5,
+          },
+        });
+      }
+    }
+  }, [showPlanetInput, tempPlanet]);
+
   return (
     <>
       <Container show={showPlanetInput}>
@@ -310,7 +345,7 @@ const PlanetInputs: React.FC = () => {
             />
           </InputContainer>
           <hr />
-          <HuePicker
+          <SliderPicker
             color={planetData.color}
             onChange={handleColorChange}
             style={{ width: "100px" }}
@@ -339,7 +374,7 @@ const Container = styled.div<ContainerProps>`
   z-index: 1;
   padding: 20px;
   opacity: ${(props) => (props.show ? "1" : "0")};
-  transition: all 1s ease;
+  transition: all 0.5s ease;
   background: rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8.3px);
@@ -348,11 +383,21 @@ const Container = styled.div<ContainerProps>`
   width: ${(props) => (props.show ? "250px" : "50px")};
   height: ${(props) => (props.show ? "600px" : "50px")};
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    width: ${(props) => (props.show ? `${window.innerWidth - 80}px` : "50px")};
+    height: ${(props) => (props.show ? "300px" : "50px")};
+    max-height: 400px;
+    margin: 0;
+    border-radius: 25px;
+    overflow: scroll;
+  }
 `;
 
 const InputContainer = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
   margin: 0;
 `;
 
@@ -380,6 +425,7 @@ const Slider = styled.input`
 const Info = styled.p`
   display: inline;
   margin-left: 10px;
+  width: 10%;
 `;
 
 const Button = styled.button`
