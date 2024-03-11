@@ -195,5 +195,17 @@ const SatContainer = styled.div<SatContainerProps>`
   gap: 20px;
   transition: all 0.5s ease, bottom 0ms ease;
   z-index: 100;
+  @media (max-width: 768px) {
+    width: 50px;
+    padding: ${(props) => (props.show ? "10px 0 10px 0" : "0")};
+    right: 75px;
+    bottom: ${(props) =>
+      `${props.numPlanets ? props.numPlanets * 50 + 80 : 75}px`};
+    gap: 10px;
+    & > * {
+      width: 20px;
+      height: 20px;
+    }
+  }
 `;
 export default PlanetsList;
