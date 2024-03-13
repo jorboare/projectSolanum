@@ -411,7 +411,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const initialSun = {
     id: "0",
     orbitRadius: 0,
-    planetRadius: 80,
+    planetRadius: 90,
     distance: 0,
     color: "#ffe500",
     pattern: "none",
