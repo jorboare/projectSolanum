@@ -53,3 +53,8 @@ input[type="range"]::-ms-fill-lower {
 input[type="range"]::-ms-fill-upper {
   background-color: #9a905d;
 }
+.compact-picker {
+  background-color: #919191;
+  margin: 0;
+  padding: 0;
+}

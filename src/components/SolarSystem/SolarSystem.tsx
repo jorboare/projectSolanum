@@ -27,7 +27,7 @@ const SolarSystem = () => {
     mapState,
     setMapState,
     thirdDimension,
-    setThirdDimension,
+    preview,
   } = useAppContext();
 
   useEffect(() => {
@@ -40,9 +40,7 @@ const SolarSystem = () => {
   }, [positions]);
   return (
     <>
-      <button onClick={() => setThirdDimension(!thirdDimension)}>3d</button>
       <MapInteractionCSS
-        showControls
         defaultValue={mapState}
         value={mapState}
         onChange={(value: any) => setMapState(value)}
@@ -51,7 +49,7 @@ const SolarSystem = () => {
           id="solarSystem"
           style={{ transform: thirdDimension ? "rotateX(60deg)" : "none" }}
         >
-          {tempPlanet && <Planet data={tempPlanet} order={-100} />}
+          {tempPlanet && preview && <Planet data={tempPlanet} order={-100} />}
           {sun && <Planet data={sun} sun={true} />}
           {state.planets &&
             state.planets.map((e, idx) => (

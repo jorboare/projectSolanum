@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 //@ts-ignore
-import { SliderPicker } from "react-color";
+import { CompactPicker } from "react-color";
 import { useAppContext } from "../../context/appContext";
 import "./PlanetInputs.css";
 import { v4 as uuidv4 } from "uuid";
+import Checkbox from "@mui/material/Checkbox";
 
 interface Planet {
   id: string;
@@ -75,7 +76,7 @@ const PlanetInputs: React.FC = () => {
     if (preview) {
       updateTempPlanet({ ...planetData, speed: 0 });
     } else cleanTempPlanet();
-  }, [planetData, preview]);
+  }, [preview]);
 
   useEffect(() => {
     if (isSun) {
@@ -95,6 +96,9 @@ const PlanetInputs: React.FC = () => {
       setPlanetData(initialPlanet);
     }
   }, [isSun]);
+  useEffect(() => {
+    updateTempPlanet({ ...planetData, speed: 0 });
+  }, [planetData]);
 
   const handleInputChange = (
     field: keyof Planet,
@@ -124,8 +128,8 @@ const PlanetInputs: React.FC = () => {
     setPreview(false);
     if (!addSatellites) savePlanet(newPlanet);
     else {
-      setAddSatellites(false);
       saveSatellite(newSatellite);
+      setAddSatellites(false);
     }
 
     cleanTempPlanet();
@@ -162,7 +166,7 @@ const PlanetInputs: React.FC = () => {
   const handleChecked = (checked: boolean) => {
     setPreview(checked);
     if (checked) {
-      updateTempPlanet({ ...planetData, speed: 0.3 });
+      updateTempPlanet({ ...planetData, speed: 0 });
     } else {
       updateTempPlanet(undefined);
     }
@@ -224,11 +228,12 @@ const PlanetInputs: React.FC = () => {
       farDistance = tempPlanet?.distance;
     }
     const minValue = 150;
-    const newScale = minValue / farDistance;
-    if (showPlanetInput) {
+    const newScale = minValue / (farDistance / 2);
+    if (showPlanetInput && preview) {
       if (window.innerWidth >= 768) {
+        const maxScale = 0.8;
         setMapState({
-          scale: newScale * 2,
+          scale: newScale >= maxScale ? maxScale : newScale,
           translation: {
             x: window.innerWidth / 3,
             y: window.innerHeight / 3,
@@ -245,6 +250,7 @@ const PlanetInputs: React.FC = () => {
         });
       }
     }
+    if (!showPlanetInput) setPreview(false);
   }, [showPlanetInput, tempPlanet]);
 
   return (
@@ -254,24 +260,58 @@ const PlanetInputs: React.FC = () => {
         {addSatellites && <p>Satellite</p>}
         <form
           onSubmit={(e) => (isSun ? handleSunSubmit(e) : handleSubmit(e))}
-          onChange={() => updateTempPlanet({ ...planetData, speed: 0.3 })}
+          onChange={() => updateTempPlanet({ ...planetData, speed: 0 })}
         >
-          <Label>{isSun ? "Sun" : "Planet"} Radius</Label>
-          <InputContainer>
-            <Slider
-              type="range"
-              value={planetData.planetRadius}
-              min={minRadius}
-              max={maxRadius}
-              step="1"
-              onChange={(e) =>
-                handleInputChange("planetRadius", parseInt(e.target.value, 10))
-              }
-            />
-            <Info>{planetData.planetRadius}</Info>
-          </InputContainer>
-          {!isSun && (
+          <Checkboxes>
             <>
+              <Label>Preview</Label>
+              <InputContainer>
+                <Checkbox
+                  checked={preview}
+                  onChange={(e) => handleChecked(e.target.checked)}
+                  color="default"
+                />
+              </InputContainer>
+            </>
+
+            <Label>Sun</Label>
+            <InputContainer>
+              <Checkbox
+                color="default"
+                checked={isSun}
+                onChange={(e) => handleIsSun(e.target.checked)}
+              />
+            </InputContainer>
+            <Label>Satellite</Label>
+            <InputContainer>
+              <Checkbox
+                color="default"
+                checked={addSatellites}
+                onChange={(e) => setAddSatellites(e.target.checked)}
+              />
+            </InputContainer>
+          </Checkboxes>
+          <IndividualContainer>
+            <Label>{isSun ? "Sun" : "Planet"} Radius</Label>
+            <InputContainer>
+              <Slider
+                type="range"
+                value={planetData.planetRadius}
+                min={minRadius}
+                max={maxRadius}
+                step="1"
+                onChange={(e) =>
+                  handleInputChange(
+                    "planetRadius",
+                    parseInt(e.target.value, 10)
+                  )
+                }
+              />
+              <Info>{planetData.planetRadius}</Info>
+            </InputContainer>
+          </IndividualContainer>
+          {!isSun && (
+            <IndividualContainer>
               <Label>Distance</Label>
               <InputContainer>
                 <Slider
@@ -286,10 +326,10 @@ const PlanetInputs: React.FC = () => {
                 />
                 <Info>{planetData.distance}</Info>
               </InputContainer>
-            </>
+            </IndividualContainer>
           )}
           {!isSun && (
-            <>
+            <IndividualContainer>
               <Label>Speed 1-10</Label>
               <InputContainer>
                 <Slider
@@ -304,10 +344,10 @@ const PlanetInputs: React.FC = () => {
                 />
                 <Info>{planetData.speed}</Info>
               </InputContainer>
-            </>
+            </IndividualContainer>
           )}
           {!isSun && (
-            <>
+            <IndividualContainer>
               <Label>Initial Angle</Label>
               <InputContainer>
                 <Slider
@@ -325,30 +365,19 @@ const PlanetInputs: React.FC = () => {
                 />
                 <Info>{planetData.initialAngle}º</Info>
               </InputContainer>
-            </>
+            </IndividualContainer>
           )}
-          <Label>Preview</Label>
-          <InputContainer>
-            <input
-              type="checkbox"
-              checked={preview}
-              onChange={(e) => handleChecked(e.target.checked)}
+          <Label>Color</Label>
+          <ColorPickerCont>
+            <CompactPicker
+              className="colorPicker"
+              color={planetData.color}
+              onChange={handleColorChange}
+              style={{ width: "100px" }}
             />
-          </InputContainer>
-          <Label>Sun</Label>
-          <InputContainer>
-            <input
-              type="checkbox"
-              checked={isSun}
-              onChange={(e) => handleIsSun(e.target.checked)}
-            />
-          </InputContainer>
+          </ColorPickerCont>
+
           <hr />
-          <SliderPicker
-            color={planetData.color}
-            onChange={handleColorChange}
-            style={{ width: "100px" }}
-          />
           <Button type="submit">Submit</Button>
           <Button type="button" onClick={handleRandom}>
             Randomize
@@ -381,7 +410,6 @@ const Container = styled.div<ContainerProps>`
   margin: 10px 0 0 20px;
   width: ${(props) => (props.show ? "250px" : "50px")};
   height: ${(props) => (props.show ? "600px" : "50px")};
-  overflow: hidden;
 
   @media (max-width: 768px) {
     width: ${(props) => (props.show ? `${window.innerWidth - 80}px` : "50px")};
@@ -413,7 +441,7 @@ const Icon = styled.div`
 `;
 
 const Label = styled.label`
-  margin-top: 10px;
+  margin-top: 0px;
 `;
 
 const Slider = styled.input`
@@ -430,5 +458,24 @@ const Info = styled.p`
 
 const Button = styled.button`
   margin-top: 20px;
+`;
+
+const Checkboxes = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  input[type="checkbox"] {
+    color: red; /* Ajusta el margen derecho según sea necesario */
+  }
+`;
+
+const IndividualContainer = styled.div`
+  margin-top: 10px;
+`;
+const ColorPickerCont = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 export default PlanetInputs;

@@ -13,6 +13,10 @@ import ResetView from "../../assets/Icons/ResetView.png";
 import NewPlanet from "../../assets/Icons/NewPlanet.png";
 import NewSatellite from "../../assets/Icons/AddSatellite.png";
 import FollowPlanet from "../../assets/Icons/Follow.png";
+import ThirdDimension from "../../assets/Icons/ThirdDimension.png";
+import FullScreen from "../../assets/Icons/FullScreen.png";
+import EditIcon from "../../assets/Icons/Edit.png";
+import DeleteIcon from "../../assets/Icons/Delete.png";
 interface MenuDisplayed {
   open: boolean;
   idx?: number;
@@ -31,21 +35,21 @@ const buttons = {
     },
     { name: "Demo", icon: Demo, action: "showDemo" },
     { name: "Reset View", icon: ResetView, action: "resetView" },
-    { name: "Full screen", icon: ResetView, action: "setFullScreen" },
+    { name: "Full screen", icon: FullScreen, action: "setFullScreen" },
+    { name: "thirdDimension", icon: ThirdDimension, action: "thirdDimension" },
   ],
   planetsMenuGeneral: [
     { name: "Add new planet", icon: NewPlanet, action: "newPlanet" },
     { name: "Reset", icon: ResetIcon, action: "resetPlanets" },
   ],
   planetsMenuSelection: [
-    { name: "Edit", icon: PlanetIcon, action: "showPlanets" },
-    { name: "Delete", icon: ResetIcon, action: "resetPlanets" },
+    { name: "Edit", icon: EditIcon, action: "showPlanets" },
+    { name: "Delete", icon: DeleteIcon, action: "resetPlanets" },
     { name: "Follow", icon: FollowPlanet, action: "followPlanet" },
-    { name: "Add satellite", icon: NewSatellite, action: "resetPlanets" },
+    { name: "Add satellite", icon: NewSatellite, action: "newSatellite" },
   ],
   planetsMenuMultiSelection: [
-    { name: "Edit", icon: PlanetIcon, action: "showPlanets" },
-    { name: "Delete", icon: ResetIcon, action: "resetPlanets" },
+    { name: "Delete", icon: DeleteIcon, action: "resetPlanets" },
   ],
 };
 
@@ -53,7 +57,6 @@ const Menu = () => {
   const {
     cleanState,
     handleOrbits,
-    deselectPlanet,
     selectedPlanets,
     hightContrast,
     setHightContrast,
@@ -66,6 +69,10 @@ const Menu = () => {
     showPlanetInput,
     setShowPlanetInput,
     handleFullScreen,
+    setThirdDimension,
+    deselectPlanet,
+    thirdDimension,
+    setAddSatellites,
   } = useAppContext();
 
   const followPlanet = () => {
@@ -73,6 +80,7 @@ const Menu = () => {
       setFollowedPlanet(null);
     } else setFollowedPlanet(selectedPlanets[0]);
   };
+
   const handleClick = (action: string) => {
     switch (action) {
       case "showPlanets":
@@ -94,6 +102,9 @@ const Menu = () => {
       case "resetView":
         resetMapState();
         break;
+      case "thirdDimension":
+        setThirdDimension(!thirdDimension);
+        break;
       case "setFullScreen":
         handleFullScreen();
         break;
@@ -101,6 +112,11 @@ const Menu = () => {
         followPlanet();
         break;
       case "newPlanet":
+        setShowPlanetInput(!showPlanetInput);
+        if (!showPlanetInput) setOpenedMenu("Inputs");
+        break;
+      case "newSatellite":
+        setAddSatellites(true);
         setShowPlanetInput(!showPlanetInput);
         if (!showPlanetInput) setOpenedMenu("Inputs");
         break;
@@ -125,6 +141,7 @@ const Menu = () => {
       case "General":
         setShowPlanetList(false);
         setShowPlanetInput(false);
+        deselectPlanet("");
         break;
       default:
         return;
@@ -353,6 +370,18 @@ const MenuButtons = styled.img<MenuDisplayed>`
   transition: all 0.5 ease;
   cursor: pointer;
   z-index: 1000;
+
+  &:hover {
+    &:after {
+      content: "Test";
+      width: 100px;
+      background-color: red;
+      z-index: 1000px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
 
   @media (min-width: 768px) {
     &:hover {

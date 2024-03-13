@@ -133,7 +133,7 @@ const PlanetsList: React.FC = () => {
 
 const Container = styled.div<ContainerProps>`
   width: 100px;
-  max-height: ${(props) => (props.show ? "500px" : "100px")};
+  max-height: ${(props) => (props.show ? "650px" : "100px")};
   background: rgba(255, 255, 255, 0.6);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8.3px);
@@ -148,9 +148,14 @@ const Container = styled.div<ContainerProps>`
   justify-content: space-evenly;
   padding: ${(props) => (props.show ? "20px 0 120px 0" : "0")};
   opacity: ${(props) => (props.show ? "1" : "0")};
-  gap: 20px;
+  gap: 10px;
   transition: all 1s ease;
   z-index: 100;
+
+  & > * {
+    width: 40px;
+    height: 40px;
+  }
 
   @media (max-width: 768px) {
     width: 50px;
@@ -162,7 +167,7 @@ const Container = styled.div<ContainerProps>`
   }
 `;
 const SatContainer = styled.div<SatContainerProps>`
-  width: ${(props) => (props.show ? "100px" : "0px")};
+  width: ${(props) => (props.show ? "70px" : "0px")};
   height: ${(props) => (props.show ? "auto" : "0px")};
   background: rgba(255, 255, 255, 0.6);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -171,15 +176,15 @@ const SatContainer = styled.div<SatContainerProps>`
   border-radius: 50px;
   position: absolute;
   bottom: ${(props) =>
-    `${props.numPlanets ? props.numPlanets * 70 + 130 : 130}px`};
+    `${props.numPlanets ? props.numPlanets * 50 + 140 : 130}px`};
   right: 130px;
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
   justify-content: space-evenly;
-  padding: ${(props) => (props.show ? "20px 0 20px 0" : "0")};
+  padding: ${(props) => (props.show ? "10px 0 10px 0" : "0")};
   opacity: ${(props) => (props.show ? "1" : "0")};
-  gap: 20px;
+  gap: 10px;
   transition: all 0.5s ease, bottom 0ms ease;
   z-index: 100;
   @media (max-width: 768px) {

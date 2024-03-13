@@ -166,7 +166,7 @@ const Orbit = styled.div<OrbitProps>`
   border: ${(props) =>
     props.show
       ? props.dimension
-        ? "2px solid rgba(255, 255, 255, 0.5)"
+        ? "1px solid rgba(255, 255, 255, 0.4)"
         : "1px solid rgba(255, 255, 255, 0.5)"
       : "none"};
   border-radius: 50%;
