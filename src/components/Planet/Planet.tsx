@@ -32,6 +32,7 @@ interface InnerPlanetProps {
   followed?: boolean;
   sun?: boolean;
   dimension?: boolean;
+  cover?: boolean;
 }
 
 interface OrbitProps {
@@ -141,6 +142,15 @@ const Planet = (props: PlanetProps) => {
             })}
             {/* <Contorno radius={planetRadius} /> */}
           </InnerPlanet>
+          <InnerPlanet
+            color={color}
+            radius={planetRadius}
+            selected={selectedPlanets.some((p) => p === id)}
+            hightContrast={hightContrast}
+            followed={followedPlanet ? true : false}
+            dimension={thirdDimension}
+            cover={true}
+          ></InnerPlanet>
           {props.sun && (
             <InnerPlanet
               color={color}
@@ -220,6 +230,10 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   background-color: ${(props) =>
     props.hightContrast ? "transparent" : props.color || "blue"};
   z-index: ${(props) => (props.sun ? 0 : 400)};
+  clip-path: ${(props) =>
+    props.cover && !props.sun
+      ? "polygon(0% 0%, 100% 0%, 100% 50%, 0% 50%)"
+      : ""};
 `;
 
 // const Sat = styled.div`
