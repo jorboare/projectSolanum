@@ -386,6 +386,12 @@ const PlanetInputs: React.FC = () => {
           <Button type="button" onClick={handleRandom}>
             Randomize
           </Button>
+          <Button
+            type="button"
+            onClick={() => setShowPlanetInput(!showPlanetInput)}
+          >
+            Cancel
+          </Button>
         </form>
       </Container>
     </>
