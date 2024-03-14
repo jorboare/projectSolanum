@@ -79,6 +79,10 @@ const PlanetInputs: React.FC = () => {
   }, [preview]);
 
   useEffect(() => {
+    setPlanetData(initialPlanet);
+  }, [addSatellites]);
+
+  useEffect(() => {
     if (isSun) {
       setPlanetData({
         id: uuidv4(),
