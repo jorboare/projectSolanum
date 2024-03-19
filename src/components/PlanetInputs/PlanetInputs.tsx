@@ -6,6 +6,9 @@ import { useAppContext } from "../../context/appContext";
 import "./PlanetInputs.css";
 import { v4 as uuidv4 } from "uuid";
 import Checkbox from "@mui/material/Checkbox";
+import PlanetGenerator from "../PlanetGenerator/PlanetGenerator";
+import NewSatellite from "../../assets/Icons/AddSatellite.png";
+import Planet from "../Planet/Planet";
 
 interface Planet {
   id: string;
@@ -16,7 +19,6 @@ interface Planet {
   pattern: string;
   speed: number;
   initialAngle: number;
-  selected: boolean;
   satellites: Satellite[];
 }
 
@@ -29,7 +31,6 @@ interface Satellite {
   pattern: string;
   speed: number;
   initialAngle: number;
-  selected: boolean;
 }
 
 interface ContainerProps {
@@ -52,19 +53,21 @@ const PlanetInputs: React.FC = () => {
     setShowPlanetInput,
     setMapState,
     tempPlanet,
+    selPlanet,
   } = useAppContext();
-  const initialPlanet = {
-    id: uuidv4(),
-    color: "#ff0000",
-    orbitRadius: addSatellites ? 50 : 50,
-    planetRadius: addSatellites ? 3 : 50,
-    distance: addSatellites ? 50 : 100,
-    pattern: "none",
-    speed: addSatellites ? 0.3 : 0.3,
-    initialAngle: 0,
-    selected: false,
-    satellites: [],
-  };
+  const initialPlanet = selPlanet
+    ? selPlanet
+    : {
+        id: uuidv4(),
+        color: "#ff0000",
+        orbitRadius: addSatellites ? 50 : 50,
+        planetRadius: addSatellites ? 3 : 50,
+        distance: addSatellites ? 50 : 100,
+        pattern: "none",
+        speed: addSatellites ? 0.3 : 0.3,
+        initialAngle: 0,
+        satellites: [],
+      };
   const [planetData, setPlanetData] = useState<Planet>(initialPlanet);
   const [isSun, setIsSun] = useState<boolean>(false);
   const minDistance = addSatellites ? 10 : 50;
@@ -74,13 +77,19 @@ const PlanetInputs: React.FC = () => {
 
   useEffect(() => {
     if (preview) {
-      updateTempPlanet({ ...planetData, speed: 0 });
+      let satellites: Satellite[] = [];
+      if (planetData?.satellites.length > 1) {
+        satellites = planetData.satellites.map((s) => {
+          return { ...s, speed: 0 };
+        });
+      }
+      updateTempPlanet({ ...planetData, speed: 0, satellites: satellites });
     } else cleanTempPlanet();
   }, [preview]);
 
   useEffect(() => {
     setPlanetData(initialPlanet);
-  }, [addSatellites]);
+  }, [selPlanet, addSatellites]);
 
   useEffect(() => {
     if (isSun) {
@@ -93,7 +102,6 @@ const PlanetInputs: React.FC = () => {
         pattern: "none",
         speed: 0,
         initialAngle: 0,
-        selected: false,
         satellites: [],
       });
     } else {
@@ -191,7 +199,6 @@ const PlanetInputs: React.FC = () => {
       pattern: "none",
       speed: Number(generateRandomNumber(0.1, 1).toFixed(2)),
       initialAngle: generateRandomNumber(0, 360),
-      selected: false,
       satellites: [],
     };
 
@@ -257,11 +264,21 @@ const PlanetInputs: React.FC = () => {
     if (!showPlanetInput) setPreview(false);
   }, [showPlanetInput, tempPlanet]);
 
+  const handleClick = (id: string) => {
+    // const sat = selPlanet?.satellites.filter((s) => s.id === id)[0];
+    // setPlanetData(sat);
+    console.log(id);
+    setAddSatellites(true);
+  };
+
+  const handleAddSat = () => {
+    setAddSatellites(true);
+  };
+
   return (
     <>
       <Container show={showPlanetInput}>
         <Icon></Icon>
-        {addSatellites && <p>Satellite</p>}
         <form
           onSubmit={(e) => (isSun ? handleSunSubmit(e) : handleSubmit(e))}
           onChange={() => updateTempPlanet({ ...planetData, speed: 0 })}
@@ -382,6 +399,21 @@ const PlanetInputs: React.FC = () => {
           </ColorPickerCont>
 
           <hr />
+          <p>Satellites</p>
+          <SatellitesContainer>
+            {selPlanet?.satellites.map((s) => (
+              <PlanetGenerator
+                key={s.id}
+                color={s.color}
+                id={s.id}
+                onClick={() => handleClick(s.id)}
+              ></PlanetGenerator>
+            ))}
+            <AddSatellitesIcon
+              src={NewSatellite}
+              onClick={handleAddSat}
+            ></AddSatellitesIcon>
+          </SatellitesContainer>
           <Button type="submit">Submit</Button>
           <Button type="button" onClick={handleRandom}>
             Randomize
@@ -413,7 +445,14 @@ const Container = styled.div<ContainerProps>`
   -webkit-backdrop-filter: blur(8.3px);
   margin: 10px 0 0 20px;
   width: ${(props) => (props.show ? "250px" : "50px")};
-  height: ${(props) => (props.show ? "600px" : "50px")};
+  height: ${(props) => (props.show ? "auto" : "50px")};
+  max-height: 600px;
+  overflow: hidden;
+
+  @media (min-width: 768px) {
+    bottom: 130px;
+    right: 130px;
+  }
 
   @media (max-width: 768px) {
     width: ${(props) => (props.show ? `${window.innerWidth - 80}px` : "50px")};
@@ -431,6 +470,7 @@ const InputContainer = styled.div`
   justify-content: center;
   align-items: center;
   margin: 0;
+  height: 20px;
 `;
 
 const Icon = styled.div`
@@ -468,10 +508,6 @@ const Checkboxes = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
-  input[type="checkbox"] {
-    color: red; /* Ajusta el margen derecho según sea necesario */
-  }
 `;
 
 const IndividualContainer = styled.div`
@@ -481,5 +517,25 @@ const ColorPickerCont = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+const SatellitesContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+`;
+
+const AddSatellitesIcon = styled.img`
+  width: 60px;
+  filter: invert(1);
+  transition: all 0.5 ease;
+  cursor: pointer;
+  z-index: 1000;
+
+  &:hover {
+    filter: invert(0);
+    transition: filter 0.3s ease;
+  }
 `;
 export default PlanetInputs;

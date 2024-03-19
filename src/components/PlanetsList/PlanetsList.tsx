@@ -20,8 +20,11 @@ const PlanetsList: React.FC = () => {
     state,
     selectPlanet,
     setMouseInactive,
-    selectedPlanets,
     showPlanetList,
+    showPlanetInput,
+    showSatellites,
+    selPlanetIndex,
+    selPlanet,
   } = useAppContext();
   const handleClick = (id: string) => {
     selectPlanet(id);
@@ -29,9 +32,6 @@ const PlanetsList: React.FC = () => {
   //@ts-ignore
   let mouseTimer: NodeJS.Timeout | null = null;
   4;
-  const [showSatellites, setShowSatellites] = useState(false);
-  const [satellites, setSatellites] = useState<any[]>([]);
-  const [selPlanetIndex, setSelPlanetIndex] = useState<number>(0);
   const handleMouseMove = () => {
     setMouseInactive(false);
     if (mouseTimer) {
@@ -47,29 +47,20 @@ const PlanetsList: React.FC = () => {
     window.addEventListener("mousemove", handleMouseMove);
   }, []);
 
-  useEffect(() => {
-    if (selectedPlanets.length === 1) {
-      const planet = state.planets.filter(
-        (p) => selectedPlanets[0] === p.id
-      )[0];
-      const index = state.planets.findIndex((p) => selectedPlanets[0] === p.id);
-      setSelPlanetIndex(index);
-      setSatellites(planet.satellites.map((e) => e));
-      setShowSatellites(selectedPlanets.length === 1);
-    } else {
-      setShowSatellites(false);
-      setSatellites([]);
-    }
-  }, [selectedPlanets]);
-
   return (
     <>
       <SatContainer
-        show={showSatellites && satellites.length > 0}
+        show={
+          showSatellites &&
+          selPlanet !== null &&
+          selPlanet.satellites.length > 0 &&
+          !showPlanetInput
+        }
         numPlanets={selPlanetIndex}
       >
-        {satellites &&
-          satellites.map((s) => (
+        {selPlanet &&
+          selPlanet.satellites.length &&
+          selPlanet.satellites.map((s) => (
             <PlanetGenerator
               key={s.id}
               color={s.color}
@@ -117,7 +108,7 @@ const PlanetsList: React.FC = () => {
         </button>
         <button onClick={handleReset}>Reset</button>
         <button onClick={showOrbits}>Orbits</button>
-        <button onClick={() => setHightContrast(!hightContrast)}>
+        <button onClick={() => sethighContrast(!highContrast)}>
           Hight Contrast
         </button>
         <button onClick={setDemo}>Demo</button>

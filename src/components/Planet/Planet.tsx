@@ -28,7 +28,7 @@ interface InnerPlanetProps {
   color: string;
   radius: number;
   selected: boolean;
-  hightContrast: boolean;
+  highContrast: boolean;
   followed?: boolean;
   sun?: boolean;
   dimension?: boolean;
@@ -54,10 +54,11 @@ const Planet = (props: PlanetProps) => {
     planetsNumber,
     orbits,
     selectedPlanets,
-    hightContrast,
+    highContrast,
     setPositions,
     followedPlanet,
     thirdDimension,
+    newSpeed,
   } = useAppContext();
   const movingElementRef = useRef(null);
   const { planetRadius, distance, color, speed, initialAngle, id, satellites } =
@@ -65,8 +66,8 @@ const Planet = (props: PlanetProps) => {
 
   useEffect(() => {
     const movingElement: any = movingElementRef.current;
-    animateOrbit(movingElement, distance, speed, initialAngle);
-  }, [props, followedPlanet]);
+    animateOrbit(movingElement, distance, speed * newSpeed, initialAngle);
+  }, [props, followedPlanet, newSpeed]);
 
   const animateOrbit = (
     element: HTMLElement,
@@ -133,7 +134,7 @@ const Planet = (props: PlanetProps) => {
             color={color}
             radius={planetRadius}
             selected={selectedPlanets.some((p) => p === id)}
-            hightContrast={hightContrast}
+            highContrast={highContrast}
             followed={followedPlanet ? true : false}
             dimension={thirdDimension}
           >
@@ -146,7 +147,7 @@ const Planet = (props: PlanetProps) => {
             color={color}
             radius={planetRadius}
             selected={selectedPlanets.some((p) => p === id)}
-            hightContrast={hightContrast}
+            highContrast={highContrast}
             followed={followedPlanet ? true : false}
             dimension={thirdDimension}
             cover={true}
@@ -156,7 +157,7 @@ const Planet = (props: PlanetProps) => {
               color={color}
               radius={planetRadius}
               selected={selectedPlanets.some((p) => p === id)}
-              hightContrast={hightContrast}
+              highContrast={highContrast}
               sun={props.sun}
             ></InnerPlanet>
           )}
@@ -197,7 +198,7 @@ const MovingElement = styled.div`
 const InnerPlanet = styled.div<InnerPlanetProps>`
   position: absolute;
   width: ${(props) =>
-    props.hightContrast
+    props.highContrast
       ? props.radius - 5 + "px"
       : props.sun
       ? props.radius * 1.5 + "px"
@@ -205,7 +206,7 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
       ? props.radius * 2 + "px"
       : props.radius + "px" || "100px"};
   height: ${(props) =>
-    props.hightContrast
+    props.highContrast
       ? props.radius - 5 + "px"
       : props.sun
       ? props.radius * 1.5 + "px"
@@ -219,16 +220,16 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
       ? "translate(-50%, -50%) rotateY(-60deg)"
       : "translate(-50%, -50%)"};
   background-color: ${(props) =>
-    props.hightContrast ? "transparent" : props.color || "blue"};
+    props.highContrast ? "transparent" : props.color || "blue"};
   border-radius: 50%;
   transition: all 0.5s ease;
   border: ${(props) =>
-    (props.selected || props.hightContrast) && props.radius && !props.followed
+    (props.selected || props.highContrast) && props.radius && !props.followed
       ? "3px solid white"
       : ""};
   filter: ${(props) => (props.sun ? "blur(40px)" : "")};
   background-color: ${(props) =>
-    props.hightContrast ? "transparent" : props.color || "blue"};
+    props.highContrast ? "transparent" : props.color || "blue"};
   z-index: ${(props) => (props.sun ? 0 : 400)};
   clip-path: ${(props) =>
     props.cover && !props.sun

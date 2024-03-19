@@ -58,8 +58,8 @@ const Menu = () => {
     cleanState,
     handleOrbits,
     selectedPlanets,
-    hightContrast,
-    setHightContrast,
+    highContrast,
+    sethighContrast,
     setDemo,
     setFollowedPlanet,
     followedPlanet,
@@ -94,7 +94,7 @@ const Menu = () => {
         handleOrbits();
         break;
       case "highContrastMode":
-        setHightContrast(!hightContrast);
+        sethighContrast(!highContrast);
         break;
       case "showDemo":
         setDemo();
@@ -132,8 +132,8 @@ const Menu = () => {
   useEffect(() => {
     switch (openedMenu) {
       case "Inputs":
-        setOpenHorizontalMenu(false);
-        setShowPlanetList(false);
+        // setOpenHorizontalMenu(false);
+        // setShowPlanetList(false);
         break;
       case "Planets":
         setShowPlanetInput(false);

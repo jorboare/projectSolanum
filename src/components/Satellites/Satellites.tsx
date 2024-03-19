@@ -5,7 +5,7 @@ import styled from "styled-components";
 interface SatelliteCompProps {
   radius: number;
   color: string;
-  hightContrast: boolean;
+  highContrast: boolean;
   dimension: boolean;
 }
 
@@ -22,15 +22,15 @@ interface SatelliteProps {
 }
 
 const Satellite = (props: SatelliteProps) => {
-  const { planetsNumber, orbits, hightContrast, thirdDimension } =
+  const { planetsNumber, orbits, highContrast, thirdDimension, newSpeed } =
     useAppContext();
   const movingElementRef = useRef(null);
   const { planetRadius, distance, color, speed, initialAngle } = props.data; //TO DO: Create interface
 
   useEffect(() => {
     const movingElement: any = movingElementRef.current;
-    animateOrbit(movingElement, distance, speed, initialAngle);
-  }, [props, thirdDimension]);
+    animateOrbit(movingElement, distance, speed * newSpeed, initialAngle);
+  }, [props, thirdDimension, newSpeed]);
 
   const animateOrbit = (
     element: HTMLElement,
@@ -73,7 +73,7 @@ const Satellite = (props: SatelliteProps) => {
           <SatelliteBody
             color={color}
             radius={planetRadius}
-            hightContrast={hightContrast}
+            highContrast={highContrast}
             dimension={thirdDimension}
           ></SatelliteBody>
         </MovingElement>
@@ -118,13 +118,13 @@ const MovingElement = styled.div`
 const SatelliteBody = styled.div<SatelliteCompProps>`
   position: absolute;
   width: ${(props) =>
-    props.hightContrast
+    props.highContrast
       ? props.radius - 5 + "px"
       : props.dimension
       ? props.radius * 2 + "px"
       : props.radius + "px" || "100px"};
   height: ${(props) =>
-    props.hightContrast
+    props.highContrast
       ? props.radius - 5 + "px"
       : props.dimension
       ? props.radius * 2 + "px"
@@ -136,10 +136,10 @@ const SatelliteBody = styled.div<SatelliteCompProps>`
       ? "translate(-50%, -50%) rotateY(-60deg)"
       : "translate(-50%, -50%);"};
   background-color: ${(props) =>
-    props.hightContrast ? "transparent" : props.color || "blue"};
+    props.highContrast ? "transparent" : props.color || "blue"};
   border-radius: 50%;
   transition: all 0.5s ease;
-  border: ${(props) => (props.hightContrast ? "3px solid white" : "")};
+  border: ${(props) => (props.highContrast ? "3px solid white" : "")};
 `;
 
 export default memo(Satellite);
