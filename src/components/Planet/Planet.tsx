@@ -137,7 +137,7 @@ const Planet = (props: PlanetProps) => {
 
   useEffect(() => {
     const movingElement: any = movingElementRef.current;
-    animateOrbit(movingElement, distance, speed, initialAngle);
+    animateOrbit(movingElement, distance, speed / 3, initialAngle);
   }, [props, newSpeed]);
 
   const animateOrbit = (
