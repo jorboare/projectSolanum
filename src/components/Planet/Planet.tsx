@@ -1,4 +1,4 @@
-import { useEffect, useRef, memo } from "react";
+import { useEffect, useRef, memo, useState } from "react";
 import "./Planet.css";
 import { useAppContext } from "../../context/appContext";
 import styled from "styled-components";
@@ -49,6 +49,14 @@ interface PlanetProps {
   onClick?: () => void; // Añadir la propiedad onClick
 }
 
+interface CoordinatesInterface {
+  id: string;
+  coordinates: {
+    x: number;
+    y: number;
+  };
+}
+
 const Planet = (props: PlanetProps) => {
   const {
     planetsNumber,
@@ -64,10 +72,73 @@ const Planet = (props: PlanetProps) => {
   const { planetRadius, distance, color, speed, initialAngle, id, satellites } =
     props.data;
 
+  const [coordinates, setCoordinates] = useState<CoordinatesInterface>();
+
   useEffect(() => {
     const movingElement: any = movingElementRef.current;
-    animateOrbit(movingElement, distance, speed * newSpeed, initialAngle);
-  }, [props, followedPlanet, newSpeed]);
+    // const widthOffset = movingElement.offsetWidth / 2;
+    const heightOffset = movingElement.offsetHeight / 2;
+    if (id === followedPlanet) {
+      // console.log("screen.width ---->", screen.width);
+      // console.log("screen.height ---->", screen.height);
+      // console.log("pos ---->", {
+      //   x: -x - screen.width,
+      //   y: -y - screen.height,
+      // });
+      //works for scale: 3
+      // setPositions({
+      //   x: -x * 3 - screen.width - widthOffset,
+      //   y: -y * 3 - screen.height - heightOffset,
+      // });
+      // This works for scale: 1
+      if (coordinates) {
+        // setPositions({
+        //   x: -coordinates?.coordinates.x + screen.width / 2,
+        //   y: -coordinates?.coordinates.y,
+        // });
+        // This works for scale: 2
+        // console.log("coordinates.coordinates.x", coordinates.coordinates.x);
+        // console.log("coordinates.coordinates.y", coordinates.coordinates.y);
+        // setPositions({
+        //   x: -coordinates?.coordinates.x,
+        //   y: -coordinates?.coordinates.y,
+        // });
+
+        if (thirdDimension) {
+          const inclination = (50 * Math.PI) / 180;
+          const adjustedX =
+            coordinates?.coordinates.x * Math.cos(inclination) -
+            coordinates?.coordinates.y * Math.sin(inclination);
+          const adjustedY =
+            coordinates?.coordinates.x * Math.sin(inclination) +
+            coordinates?.coordinates.y * Math.cos(inclination);
+          setPositions({
+            scale: 1,
+            translation: {
+              x: -adjustedX + screen.width / 2,
+              y: -adjustedY + screen.height / 20,
+            },
+          });
+        } else {
+          setPositions({
+            scale: 2,
+            translation: {
+              x: -coordinates?.coordinates.x * 2 + screen.width / 2,
+              y:
+                -coordinates?.coordinates.y * 2 -
+                screen.height / 2 +
+                heightOffset,
+            },
+          });
+        }
+      }
+    }
+  }, [coordinates]);
+
+  useEffect(() => {
+    const movingElement: any = movingElementRef.current;
+    animateOrbit(movingElement, distance, speed, initialAngle);
+  }, [props, newSpeed]);
 
   const animateOrbit = (
     element: HTMLElement,
@@ -86,6 +157,7 @@ const Planet = (props: PlanetProps) => {
       angle += orbitSpeed;
       const x = Math.cos((angle * Math.PI) / 180) * orbitRadius;
       const y = Math.sin((angle * Math.PI) / 180) * orbitRadius;
+      setCoordinates({ id: id, coordinates: { x, y } });
 
       element.style.transform = `translate(${x - widthOffset}px, ${
         y - heightOffset
@@ -104,14 +176,14 @@ const Planet = (props: PlanetProps) => {
         //   y: -y * 3 - screen.height - heightOffset,
         // });
         // This works for scale: 1
-        setPositions({
-          x: -x + screen.width / 2,
-          y: -y,
-        });
+        // setPositions({
+        //   x: -x + screen.width / 2,
+        //   y: -y,
+        // });
         // This works for scale: 2
         // setPositions({
-        //   x: -x * 2 - screen.width / 2 - widthOffset,
-        //   y: -y * 2 - screen.height / 2 - heightOffset,
+        //   x: -x * 2 + screen.width / 2,
+        //   y: -y * 2 - screen.height / 2 + heightOffset,
         // });
       }
 
@@ -182,7 +254,7 @@ const Orbit = styled.div<OrbitProps>`
       : "none"};
   border-radius: 50%;
   margin: 0 auto;
-  transition: all 0.5s ease;
+  transition: all 0s ease;
   z-index: ${(props) => props.index};
 `;
 
@@ -222,7 +294,7 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   background-color: ${(props) =>
     props.highContrast ? "transparent" : props.color || "blue"};
   border-radius: 50%;
-  transition: all 0.5s ease;
+  transition: all 0s ease, border 0.5s ease;
   border: ${(props) =>
     (props.selected || props.highContrast) && props.radius && !props.followed
       ? "3px solid white"

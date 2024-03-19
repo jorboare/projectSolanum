@@ -5,8 +5,22 @@ import {
   ReactNode,
   useEffect,
 } from "react";
-import { initialAppStateDemo, initialSun } from "../utils/data/demoSystems";
+import {
+  initialAppStateDemo,
+  initialSun,
+  initialAppStateDemoSolanum,
+} from "../utils/data/demoSystems";
+import Halo from "../assets/Halo 2 Anniversary OST - Promise the Girl.mp3";
+import Outer from "../assets/Outer Wilds OST - Travelers (All Instruments Join)_YR_wIb_n4ZU.mp3";
 
+const demos = {
+  Outer: {
+    name: "Outer",
+    song: Outer,
+    system: initialAppStateDemoSolanum,
+  },
+  Solar: { name: "Solar", song: Halo, system: initialAppStateDemo },
+};
 interface AppState {
   planets: Planet[];
 }
@@ -87,6 +101,8 @@ interface AppContextType {
   selPlanet: Planet | null;
   newSpeed: number;
   setSpeed: (speed: number) => void;
+  setCinematic: (status: boolean) => void;
+  cinematic: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -111,7 +127,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [selectedPlanets, setSelectedPlanets] = useState<string[]>([]); //Array of planet ids
   const [addSatellites, setAddSatellites] = useState<boolean>(false); //state of editing and modifying sattelites
   const [highContrast, sethighContrast] = useState<boolean>(false); //Enables hight contrast mode, white border and no colors
-  const [positions, setPositions] = useState({ x: 0, y: 0 });
+  const [positions, setPositions] = useState({
+    scale: 2,
+    translation: { x: 0, y: 1 },
+  });
   const [followedPlanet, setFollowedPlanet] = useState<string | null>(null); //ID of the followed planet
   const [mapState, setMapState] = useState({
     scale: 0.5,
@@ -124,6 +143,54 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [selPlanet, setSelPlanet] = useState<Planet | null>(null);
   const [selPlanetIndex, setSelPlanetIndex] = useState<number>(0);
   const [newSpeed, setSpeed] = useState<number>(1);
+  const [cinematic, setCinematic] = useState<boolean>(false);
+  const [demoApplied, selectedDemo] = useState<any>({
+    name: "Solar",
+    song: Halo,
+    system: initialAppStateDemo,
+  });
+
+  useEffect(() => {
+    setState(demoApplied.system);
+  }, [demoApplied]);
+
+  useEffect(() => {
+    const audio = new Audio(demoApplied.song);
+    let interval: any;
+    if (cinematic) {
+      handleFullScreen();
+
+      setFollowedPlanet(getRandomId());
+      audio.addEventListener("canplay", () => {
+        audio.volume = 0.3;
+        audio.play();
+      });
+      interval = setInterval(() => {
+        const randomBoolean = Math.random() > 0.5;
+        const randomId = getRandomId();
+        const randomPlanet = state.planets.filter((p) => p.id === randomId);
+        console.log();
+        if (randomBoolean && randomPlanet[0].speed < 0.3)
+          setThirdDimension(randomBoolean);
+        else {
+          setThirdDimension(false);
+        }
+        setFollowedPlanet(getRandomId());
+      }, 7000);
+      return () => clearInterval(interval);
+    } else {
+      handleFullScreen();
+      audio.pause();
+      clearInterval(interval);
+      setFollowedPlanet("");
+    }
+  }, [cinematic]);
+
+  const getRandomId = () => {
+    const ids = state.planets.map((p) => p.id);
+    const randomId = ids[Math.floor(Math.random() * ids.length)];
+    return randomId;
+  };
 
   useEffect(() => {
     localStorage.setItem("appState", JSON.stringify(state));
@@ -144,7 +211,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const selectPlanet = (id: string) => {
     if (!selectedPlanets.some((e) => e === id)) {
-      setSelectedPlanets([...selectedPlanets, id]);
+      setSelectedPlanets([id]);
     } else deselectPlanet(id);
   };
 
@@ -269,7 +336,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // });
     // setSun(initialSun);
     // setState({ ...initialAppStateDemo, planets: demoCopy });
-    setState({ ...initialAppStateDemo });
+    if (demoApplied.name === "Solar") {
+      selectedDemo(demos.Outer);
+    } else {
+      selectedDemo(demos.Solar);
+    }
   };
 
   const handleFullScreen = () => {
@@ -332,6 +403,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         selPlanet,
         newSpeed,
         setSpeed,
+        setCinematic,
+        cinematic,
       }}
     >
       {children}

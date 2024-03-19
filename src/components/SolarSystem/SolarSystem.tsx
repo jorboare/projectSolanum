@@ -28,49 +28,16 @@ const SolarSystem = () => {
     setMapState,
     thirdDimension,
     preview,
-    newSpeed,
-    setSpeed,
   } = useAppContext();
 
   useEffect(() => {
     if (followedPlanet) {
-      setMapState({
-        scale: 1,
-        translation: positions,
-      });
+      setMapState(positions);
     }
   }, [positions]);
 
-  const calcSpeed = (variable: string) => {
-    let speed = newSpeed;
-    switch (variable) {
-      case "less":
-        if (speed === 0) speed = 1;
-        if (speed > 0.125) speed = speed / 2;
-        break;
-      case "stop":
-        speed = 0;
-        break;
-      case "normal":
-        speed = 1;
-        break;
-      case "add":
-        if (speed < 6) speed = speed += 1;
-        break;
-      default:
-        speed = 1;
-        return;
-    }
-    console.log(speed);
-    setSpeed(speed);
-  };
   return (
     <>
-      <button onClick={() => calcSpeed("less")}>-</button>
-      <button onClick={() => calcSpeed("stop")}>stop</button>
-      <button onClick={() => calcSpeed("normal")}>normal</button>
-      <button onClick={() => calcSpeed("add")}>+</button>
-      <p style={{ color: "white" }}>x{newSpeed}</p>
       <MapInteractionCSS
         defaultValue={mapState}
         value={mapState}

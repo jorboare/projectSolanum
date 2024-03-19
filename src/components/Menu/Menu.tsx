@@ -10,13 +10,9 @@ import OrbitsIcon from "../../assets/Icons/Orbits.png";
 import HighContrast from "../../assets/Icons/HighContrast.png";
 import Demo from "../../assets/Icons/Demo.png";
 import ResetView from "../../assets/Icons/ResetView.png";
-import NewPlanet from "../../assets/Icons/NewPlanet.png";
-import NewSatellite from "../../assets/Icons/AddSatellite.png";
 import FollowPlanet from "../../assets/Icons/Follow.png";
 import ThirdDimension from "../../assets/Icons/ThirdDimension.png";
 import FullScreen from "../../assets/Icons/FullScreen.png";
-import EditIcon from "../../assets/Icons/Edit.png";
-import DeleteIcon from "../../assets/Icons/Delete.png";
 interface MenuDisplayed {
   open: boolean;
   idx?: number;
@@ -33,23 +29,18 @@ const buttons = {
       icon: HighContrast,
       action: "highContrastMode",
     },
-    { name: "Demo", icon: Demo, action: "showDemo" },
+
     { name: "Reset View", icon: ResetView, action: "resetView" },
     { name: "Full screen", icon: FullScreen, action: "setFullScreen" },
     { name: "thirdDimension", icon: ThirdDimension, action: "thirdDimension" },
+    { name: "cinematic", icon: ThirdDimension, action: "cinematic" },
   ],
   planetsMenuGeneral: [
-    { name: "Add new planet", icon: NewPlanet, action: "newPlanet" },
+    { name: "Demo", icon: Demo, action: "showDemo" },
     { name: "Reset", icon: ResetIcon, action: "resetPlanets" },
   ],
   planetsMenuSelection: [
-    { name: "Edit", icon: EditIcon, action: "showPlanets" },
-    { name: "Delete", icon: DeleteIcon, action: "resetPlanets" },
     { name: "Follow", icon: FollowPlanet, action: "followPlanet" },
-    { name: "Add satellite", icon: NewSatellite, action: "newSatellite" },
-  ],
-  planetsMenuMultiSelection: [
-    { name: "Delete", icon: DeleteIcon, action: "resetPlanets" },
   ],
 };
 
@@ -73,6 +64,11 @@ const Menu = () => {
     deselectPlanet,
     thirdDimension,
     setAddSatellites,
+    newSpeed,
+    setSpeed,
+    mouseInactive,
+    setCinematic,
+    cinematic,
   } = useAppContext();
 
   const followPlanet = () => {
@@ -119,6 +115,9 @@ const Menu = () => {
         setAddSatellites(true);
         setShowPlanetInput(!showPlanetInput);
         if (!showPlanetInput) setOpenedMenu("Inputs");
+        break;
+      case "cinematic":
+        setCinematic(!cinematic);
         break;
       default:
         return;
@@ -175,8 +174,8 @@ const Menu = () => {
     if (selectedPlanets.length === 1) {
       horizontalMenuHandler(buttons.planetsMenuSelection, true);
     } else if (selectedPlanets.length > 1) {
-      if (menuButtons != buttons.planetsMenuMultiSelection)
-        horizontalMenuHandler(buttons.planetsMenuMultiSelection, true);
+      // if (menuButtons != buttons.planetsMenuMultiSelection)
+      //   horizontalMenuHandler(buttons.planetsMenuMultiSelection, true);
     } else if (showPlanetList) {
       horizontalMenuHandler(buttons.planetsMenuGeneral, true);
     }
@@ -189,8 +188,34 @@ const Menu = () => {
       setOpenHorizontalMenu(reopen);
     }, 500);
   };
+
+  const calcSpeed = (variable: string) => {
+    let speed = newSpeed;
+    switch (variable) {
+      case "less":
+        if (speed === 0) speed = 1;
+        if (speed > 0.125) speed = speed / 2;
+        break;
+      case "stop":
+        speed = 0;
+        break;
+      case "normal":
+        speed = 1;
+        break;
+      case "add":
+        if (speed === 0) speed = 1;
+        if (speed < 1) speed = speed * 2;
+        if (speed >= 1 && speed < 6) speed = speed += 1;
+        break;
+      default:
+        speed = 1;
+        return;
+    }
+    console.log(speed);
+    setSpeed(speed);
+  };
   return (
-    <>
+    <div style={{ opacity: mouseInactive ? "0" : "1" }}>
       <MenuContainer open={openHorizontalMenu}>
         <IconContainer
           onClick={() => handleMenuClick()}
@@ -213,7 +238,12 @@ const Menu = () => {
           />
         ))}
       </MenuDisplayed>
-    </>
+      <p style={{ color: "white" }}>x{newSpeed}</p>
+      <button onClick={() => calcSpeed("less")}>-</button>
+      <button onClick={() => calcSpeed("stop")}>stop</button>
+      <button onClick={() => calcSpeed("normal")}>normal</button>
+      <button onClick={() => calcSpeed("add")}>+</button>
+    </div>
   );
 };
 

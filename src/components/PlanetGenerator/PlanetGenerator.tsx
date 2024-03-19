@@ -27,7 +27,7 @@ const Planet = styled.div<PlanetProps>`
 interface PlanetGeneratorProps {
   color: string;
   size?: number;
-  onClick: () => void;
+  onClick?: () => void;
   id: string;
 }
 

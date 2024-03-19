@@ -103,7 +103,7 @@ const Orbit = styled.div<OrbitProps>`
   border-radius: 50%;
   margin: 0 auto;
   z-index: ${(props) => (props.index ? props.index : "0")};
-  transition: all 0.5s ease;
+  transition: all 0s ease;
 `;
 
 const MovingElement = styled.div`
@@ -138,7 +138,7 @@ const SatelliteBody = styled.div<SatelliteCompProps>`
   background-color: ${(props) =>
     props.highContrast ? "transparent" : props.color || "blue"};
   border-radius: 50%;
-  transition: all 0.5s ease;
+  transition: all 0s ease;
   border: ${(props) => (props.highContrast ? "3px solid white" : "")};
 `;
 

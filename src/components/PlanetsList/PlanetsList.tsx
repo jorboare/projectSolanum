@@ -40,7 +40,7 @@ const PlanetsList: React.FC = () => {
 
     mouseTimer = setTimeout(() => {
       setMouseInactive(true);
-    }, 5000);
+    }, 8000);
   };
 
   useEffect(() => {
@@ -61,13 +61,7 @@ const PlanetsList: React.FC = () => {
         {selPlanet &&
           selPlanet.satellites.length &&
           selPlanet.satellites.map((s) => (
-            <PlanetGenerator
-              key={s.id}
-              color={s.color}
-              onClick={() => handleClick(s.id)}
-              id={s.id}
-              size={40}
-            />
+            <PlanetGenerator key={s.id} color={s.color} id={s.id} size={40} />
           ))}
       </SatContainer>
       <Container show={showPlanetList}>
@@ -76,8 +70,8 @@ const PlanetsList: React.FC = () => {
               <PlanetGenerator
                 key={p.id}
                 color={p.color}
-                onClick={() => handleClick(p.id)}
                 id={p.id}
+                onClick={() => handleClick(p.id)}
               />
             ))
           : null}
