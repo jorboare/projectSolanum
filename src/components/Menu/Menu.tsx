@@ -419,6 +419,7 @@ const MenuDisplayed = styled.div<MenuDisplayed>`
     height: 50px;
     gap: 5px;
     padding: ${(props) => (props.open ? "0px 60px 0px 20px" : "0")};
+    margin-left: 10px;
   }
 `;
 
@@ -470,7 +471,9 @@ const MenuButtons = styled.img<MenuDisplayed>`
       filter: invert(0);
       transition: filter 0.3s ease;
     }
-    width: 40px;
+    box-sizing: content-box;
+    width: 100%;
+    max-width: 40px;
     gap: 10px;
   }
 `;
