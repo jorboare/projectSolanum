@@ -1,4 +1,5 @@
 export const initialAppStateDemoSolanum = {
+  name: "Outer",
   planets: [
     {
       id: "1",
@@ -412,6 +413,7 @@ export const initialAppStateDemoRealScale = {
 };
 
 export const initialAppStateDemo = {
+  name: "Solar",
   planets: [
     {
       id: "1",

@@ -99,14 +99,11 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const initialAppState = {
-    name: "Test",
-    planets: [],
-  };
+  const initialAppState = initialAppStateDemo;
 
   const [state, setState] = useState<AppState>(() => {
-    const savedState = localStorage.getItem("appState");
-    return savedState ? JSON.parse(savedState) : initialAppState;
+    const savedState = initialAppState;
+    return savedState;
   }); //takes the state in localStorage if there is one stored or keeps the state empty
   const [sun, setSun] = useState<Planet>(() => {
     const savedState = localStorage.getItem("appSun");
@@ -139,14 +136,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const [intervalId, setIntervalId] = useState<any>(null);
   const [fullScreen, setFullScreen] = useState<boolean>(false);
-  //Stores the state when changes
-  useEffect(() => {
-    localStorage.setItem("appState", JSON.stringify(state));
-  }, [state]);
-  //Stores the sun object when changes
-  useEffect(() => {
-    localStorage.setItem("appSun", JSON.stringify(sun));
-  }, [sun]);
 
   //Handles the cinematic mode
   useEffect(() => {
