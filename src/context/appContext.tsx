@@ -291,6 +291,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  //Used to observe the changes on the fullscreen action
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      setFullScreen(document.fullscreenElement !== null);
+    };
+    document.addEventListener("fullscreenchange", handleFullScreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullScreenChange);
+    };
+  }, []);
+
   const handleFullScreen = (fullScreenAction: boolean) => {
     if (fullScreenAction) {
       if (document.documentElement.requestFullscreen) {
