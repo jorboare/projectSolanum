@@ -21,7 +21,6 @@ const PlanetsList: React.FC = () => {
     selectPlanet,
     setMouseInactive,
     showPlanetList,
-    showPlanetInput,
     showSatellites,
     selPlanetIndex,
     selPlanet,
@@ -53,8 +52,7 @@ const PlanetsList: React.FC = () => {
         show={
           showSatellites &&
           selPlanet !== null &&
-          selPlanet.satellites.length > 0 &&
-          !showPlanetInput
+          selPlanet.satellites.length > 0
         }
         numPlanets={selPlanetIndex}
       >
@@ -75,42 +73,6 @@ const PlanetsList: React.FC = () => {
               />
             ))
           : null}
-        {/* {selectedPlanets.length === 1 && (
-          <button onClick={() => setAddSatellites(!addSatellites)}>
-            Add satellites
-          </button>
-        )}
-        {selectedPlanets.length === 1 && (
-          <button
-            onClick={() => {
-              if (followedPlanet) {
-                setFollowedPlanet(null);
-              } else setFollowedPlanet(selectedPlanets[0]);
-            }}
-          >
-            {followedPlanet ? "Unfollow" : "Follow"}
-          </button>
-        )}
-        <button onClick={unSelectPlanets}>Unselect</button>
-        <button
-          onClick={() => {
-            setShowSatellites(false);
-            deletePlanets();
-          }}
-        >
-          Delete Selected Planets
-        </button>
-        <button onClick={handleReset}>Reset</button>
-        <button onClick={showOrbits}>Orbits</button>
-        <button onClick={() => sethighContrast(!highContrast)}>
-          Hight Contrast
-        </button>
-        <button onClick={setDemo}>Demo</button>
-
-        <button id="fullscreen-button" onClick={handleFullScreen}>
-          {fullScreen ? "Close" : "Full screen"}
-        </button>
-        <button onClick={resetValue}>Reset scale</button> */}
       </Container>
     </>
   );
@@ -177,7 +139,7 @@ const SatContainer = styled.div<SatContainerProps>`
     padding: ${(props) => (props.show ? "10px 0 10px 0" : "0")};
     right: 75px;
     bottom: ${(props) =>
-      `${props.numPlanets ? props.numPlanets * 50 + 80 : 75}px`};
+      `${props.numPlanets ? props.numPlanets * 40 + 80 : 75}px`};
     gap: 10px;
     & > * {
       width: 20px;

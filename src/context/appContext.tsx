@@ -10,18 +10,16 @@ import {
   initialSun,
   initialAppStateDemoSolanum,
 } from "../utils/data/demoSystems";
-import Halo from "../assets/Halo 2 Anniversary OST - Promise the Girl.mp3";
-import Outer from "../assets/Outer Wilds OST - Travelers (All Instruments Join)_YR_wIb_n4ZU.mp3";
 
 const demos = {
   Outer: {
     name: "Outer",
-    song: Outer,
     system: initialAppStateDemoSolanum,
   },
-  Solar: { name: "Solar", song: Halo, system: initialAppStateDemo },
+  Solar: { name: "Solar", system: initialAppStateDemo },
 };
 interface AppState {
+  name: string;
   planets: Planet[];
 }
 
@@ -34,6 +32,7 @@ interface Planet {
   pattern: string;
   speed: number;
   initialAngle: number;
+  name?: string;
   satellites: Satellite[];
 }
 
@@ -58,25 +57,16 @@ interface Satellite {
 
 interface AppContextType {
   state: AppState;
-  tempPlanet?: Planet;
-  updateState: (newState: AppState) => void;
   cleanState: () => void;
   selectPlanet: (id: string) => void;
   deselectPlanet: (id: string) => void;
   selectedPlanets: string[];
   planetsNumber: () => number;
-  updateTempPlanet: (planet?: Planet) => void;
-  cleanTempPlanet: () => void;
-  preview: boolean;
-  setPreview: (preview: boolean) => void;
   handleOrbits: () => void;
   orbits: boolean;
   setMouseInactive: (mouseStatus: boolean) => void;
   mouseInactive: boolean;
   deletePlanets: () => void;
-  addSatellites: boolean;
-  setAddSatellites: (addSatellite: boolean) => void;
-  saveSatellite: (newSatellite: Satellite) => void;
   sun: Planet | undefined;
   setSun: (sun: Planet) => void;
   sethighContrast: (contrast: boolean) => void;
@@ -91,11 +81,10 @@ interface AppContextType {
   resetMapState: () => void;
   showPlanetList: boolean;
   setShowPlanetList: (show: boolean) => void;
-  showPlanetInput: boolean;
-  setShowPlanetInput: (show: boolean) => void;
   setThirdDimension: (dimension: boolean) => void;
   thirdDimension: boolean;
-  handleFullScreen: () => void;
+  handleFullScreen: (action: boolean) => void;
+  fullScreen: boolean;
   showSatellites: boolean;
   selPlanetIndex: number;
   selPlanet: Planet | null;
@@ -103,12 +92,15 @@ interface AppContextType {
   setSpeed: (speed: number) => void;
   setCinematic: (status: boolean) => void;
   cinematic: boolean;
+  generalScale: number;
+  setGeneralScale: (scale: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const initialAppState = {
+    name: "Test",
     planets: [],
   };
 
@@ -116,97 +108,102 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const savedState = localStorage.getItem("appState");
     return savedState ? JSON.parse(savedState) : initialAppState;
   }); //takes the state in localStorage if there is one stored or keeps the state empty
-  const [tempPlanet, setTempPlanet] = useState<Planet | undefined>(undefined); //used to show the planet being edited
   const [sun, setSun] = useState<Planet>(() => {
     const savedState = localStorage.getItem("appSun");
     return savedState ? JSON.parse(savedState) : initialSun;
   }); //the sun is stored apart from the planets even if it's rendered similar, easier to edit and modify it.
-  const [preview, setPreview] = useState(false);
   const [orbits, setOrbits] = useState(true); //show or hide orbits
   const [mouseInactive, setMouseInactive] = useState<boolean>(false); //LIKELY DELETEABLE, it was used to hide the UI when inactive 5s
   const [selectedPlanets, setSelectedPlanets] = useState<string[]>([]); //Array of planet ids
-  const [addSatellites, setAddSatellites] = useState<boolean>(false); //state of editing and modifying sattelites
   const [highContrast, sethighContrast] = useState<boolean>(false); //Enables hight contrast mode, white border and no colors
   const [positions, setPositions] = useState({
-    scale: 2,
+    scale: 0.5,
     translation: { x: 0, y: 1 },
   });
   const [followedPlanet, setFollowedPlanet] = useState<string | null>(null); //ID of the followed planet
+  const [generalScale, setGeneralScale] = useState<number>(0.5);
   const [mapState, setMapState] = useState({
-    scale: 0.5,
+    scale: generalScale,
     translation: { x: window.innerWidth / 2, y: window.innerHeight / 4 },
   }); //map state to reset de view
   const [showPlanetList, setShowPlanetList] = useState<boolean>(false);
-  const [showPlanetInput, setShowPlanetInput] = useState<boolean>(false);
   const [thirdDimension, setThirdDimension] = useState<boolean>(false); //enables/disables the 3d perspective
   const [showSatellites, setShowSatellites] = useState(false); //Show satellites in the planetList menu
-  const [selPlanet, setSelPlanet] = useState<Planet | null>(null);
-  const [selPlanetIndex, setSelPlanetIndex] = useState<number>(0);
-  const [newSpeed, setSpeed] = useState<number>(1);
-  const [cinematic, setCinematic] = useState<boolean>(false);
+  const [selPlanet, setSelPlanet] = useState<Planet | null>(null); //Object of the selected planet, only one planet selected
+  const [selPlanetIndex, setSelPlanetIndex] = useState<number>(0); //Index of the planet in the state used to calculate the height of the satellites menu
+  const [newSpeed, setSpeed] = useState<number>(1); //General render speed
+  const [cinematic, setCinematic] = useState<boolean>(false); //Enable/disable cinematic mode
   const [demoApplied, selectedDemo] = useState<any>({
     name: "Solar",
-    song: Halo,
     system: initialAppStateDemo,
   });
-
+  const [intervalId, setIntervalId] = useState<any>(null);
+  const [fullScreen, setFullScreen] = useState<boolean>(false);
+  //Stores the state when changes
   useEffect(() => {
-    setState(demoApplied.system);
-  }, [demoApplied]);
-
+    localStorage.setItem("appState", JSON.stringify(state));
+  }, [state]);
+  //Stores the sun object when changes
   useEffect(() => {
-    const audio = new Audio(demoApplied.song);
-    let interval: any;
+    localStorage.setItem("appSun", JSON.stringify(sun));
+  }, [sun]);
+
+  //Handles the cinematic mode
+  useEffect(() => {
     if (cinematic) {
-      handleFullScreen();
-
       setFollowedPlanet(getRandomId());
-      audio.addEventListener("canplay", () => {
-        audio.volume = 0.3;
-        audio.play();
-      });
-      interval = setInterval(() => {
-        const randomBoolean = Math.random() > 0.5;
-        const randomId = getRandomId();
+      const interval = setInterval(() => {
+        const randomBoolean = randomBooleanGenerator();
+        let randomId = getRandomId();
         const randomPlanet = state.planets.filter((p) => p.id === randomId);
-        console.log();
-        if (randomBoolean && randomPlanet[0].speed < 0.3)
+
+        if (randomBoolean && randomPlanet[0].speed < 0.3) {
+          setGeneralScale(randomBooleanGenerator() ? 2 : 1);
           setThirdDimension(randomBoolean);
-        else {
+          setFollowedPlanet(randomId);
+        } else {
           setThirdDimension(false);
+          setFollowedPlanet(randomId);
         }
-        setFollowedPlanet(getRandomId());
       }, 7000);
-      return () => clearInterval(interval);
+      setIntervalId(interval);
     } else {
-      handleFullScreen();
-      audio.pause();
-      clearInterval(interval);
+      if (intervalId) {
+        clearInterval(intervalId);
+        setIntervalId(null);
+      }
       setFollowedPlanet("");
     }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        setIntervalId(null);
+      }
+    };
   }, [cinematic]);
 
+  /**
+   * Generates a random boolean
+   * @returns {Boolean}
+   */
+  const randomBooleanGenerator = () => {
+    return Math.random() > 0.5;
+  };
+
+  /**
+   *
+   * @returns {String} Random id of a planet
+   */
   const getRandomId = () => {
     const ids = state.planets.map((p) => p.id);
     const randomId = ids[Math.floor(Math.random() * ids.length)];
     return randomId;
   };
 
-  useEffect(() => {
-    localStorage.setItem("appState", JSON.stringify(state));
-  }, [state]);
-  useEffect(() => {
-    localStorage.setItem("appSun", JSON.stringify(sun));
-  }, [sun]);
-
-  const updateState = (newState: AppState) => {
-    console.log("Prev state --->", state);
-    setState(newState);
-    console.log("New state --->", newState);
-  };
-
   const cleanState = () => {
     setState(initialAppState);
+    setSun(initialSun);
   };
 
   const selectPlanet = (id: string) => {
@@ -242,28 +239,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return state.planets.length;
   };
 
-  const updateTempPlanet = (planet?: Planet) => {
-    setTempPlanet(planet);
-  };
-
-  const cleanTempPlanet = () => {
-    setTempPlanet(undefined);
-  };
-
   const handleOrbits = () => {
     setOrbits(!orbits);
-  };
-
-  const saveSatellite = (newSatellite: Satellite) => {
-    if (selectedPlanets.length === 1 && addSatellites) {
-      const newPlanets = state.planets.map((p) => {
-        if (p.id === selectedPlanets[0]) {
-          p.satellites.push(newSatellite);
-          return p;
-        } else return p;
-      });
-      setState({ ...state, planets: newPlanets });
-    }
   };
 
   const resetMapState = () => {
@@ -279,7 +256,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         scale: newScale * 2,
         translation: {
           x: window.innerWidth / 2,
-          y: window.innerHeight / 2.7,
+          y: window.innerHeight / 4,
         },
       });
     } else {
@@ -310,48 +287,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [selectedPlanets]);
 
   const setDemo = () => {
-    // const quantumMoon = {
-    //   id: "6",
-    //   color: "#f4f4f4",
-    //   orbitRadius: 100,
-    //   planetRadius: 10,
-    //   distance: 65,
-    //   pattern: "none",
-    //   speed: 0.7,
-    //   initialAngle: 60,
-    //   selected: false,
-    //   satellites: [],
-    // };
-
-    // var item =
-    //   initialAppStateDemo.planets[
-    //     Math.floor(Math.random() * initialAppStateDemo.planets.length)
-    //   ];
-
-    // item.satellites.push(quantumMoon);
-
-    // const demoCopy = initialAppStateDemo.planets.map((e) => {
-    //   if (e.id === item.id) return item;
-    //   else return e;
-    // });
-    // setSun(initialSun);
-    // setState({ ...initialAppStateDemo, planets: demoCopy });
-    if (demoApplied.name === "Solar") {
+    if (demoApplied.name === "Solar" && state.name === "Solar") {
+      setState({
+        name: demos.Outer.name,
+        planets: demos.Outer.system.planets,
+      });
       selectedDemo(demos.Outer);
     } else {
+      setState({
+        name: demos.Solar.name,
+        planets: demos.Solar.system.planets,
+      });
       selectedDemo(demos.Solar);
     }
   };
 
-  const handleFullScreen = () => {
-    console.log("fullScreen");
-    if (document.fullscreenElement) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
+  const handleFullScreen = (fullScreenAction: boolean) => {
+    if (fullScreenAction) {
+      if (document.documentElement.requestFullscreen) {
+        setFullScreen(true);
+        document.documentElement.requestFullscreen();
       }
     } else {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) {
+          setFullScreen(false);
+          document.exitFullscreen();
+        }
       }
     }
   };
@@ -360,25 +322,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider
       value={{
         state,
-        tempPlanet,
-        updateState,
         cleanState,
         selectPlanet,
         deselectPlanet,
         planetsNumber,
-        updateTempPlanet,
-        cleanTempPlanet,
-        setPreview,
-        preview,
+
         handleOrbits,
         orbits,
         mouseInactive,
         setMouseInactive,
         selectedPlanets,
         deletePlanets,
-        addSatellites,
-        setAddSatellites,
-        saveSatellite,
         sun,
         setSun,
         highContrast,
@@ -393,9 +347,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         resetMapState,
         showPlanetList,
         setShowPlanetList,
-        showPlanetInput,
-        setShowPlanetInput,
         handleFullScreen,
+        fullScreen,
         setThirdDimension,
         thirdDimension,
         showSatellites,
@@ -405,6 +358,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setSpeed,
         setCinematic,
         cinematic,
+        generalScale,
+        setGeneralScale,
       }}
     >
       {children}

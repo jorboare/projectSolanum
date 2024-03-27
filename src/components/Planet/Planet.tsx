@@ -67,6 +67,8 @@ const Planet = (props: PlanetProps) => {
     followedPlanet,
     thirdDimension,
     newSpeed,
+    generalScale,
+    setGeneralScale,
   } = useAppContext();
   const movingElementRef = useRef(null);
   const { planetRadius, distance, color, speed, initialAngle, id, satellites } =
@@ -104,24 +106,35 @@ const Planet = (props: PlanetProps) => {
         //   y: -coordinates?.coordinates.y,
         // });
 
-        if (thirdDimension) {
-          const inclination = (50 * Math.PI) / 180;
-          const adjustedX =
-            coordinates?.coordinates.x * Math.cos(inclination) -
-            coordinates?.coordinates.y * Math.sin(inclination);
-          const adjustedY =
-            coordinates?.coordinates.x * Math.sin(inclination) +
-            coordinates?.coordinates.y * Math.cos(inclination);
+        const inclination = (50 * Math.PI) / 180;
+        const adjustedX =
+          coordinates?.coordinates.x * Math.cos(inclination) -
+          coordinates?.coordinates.y * Math.sin(inclination);
+        const adjustedY =
+          coordinates?.coordinates.x * Math.sin(inclination) +
+          coordinates?.coordinates.y * Math.cos(inclination);
+        if (thirdDimension && !generalScale) {
+          setGeneralScale(1);
           setPositions({
-            scale: 1,
+            scale: generalScale,
             translation: {
               x: -adjustedX + screen.width / 2,
               y: -adjustedY + screen.height / 20,
             },
           });
-        } else {
+        } else if (thirdDimension && generalScale === 2) {
+          console.log(-adjustedY + screen.height / (50 * 1000));
           setPositions({
-            scale: 2,
+            scale: generalScale,
+            translation: {
+              x: -adjustedX + screen.width / 2,
+              y: -adjustedY - 200,
+            },
+          });
+        } else {
+          setGeneralScale(2);
+          setPositions({
+            scale: generalScale,
             translation: {
               x: -coordinates?.coordinates.x * 2 + screen.width / 2,
               y:
@@ -133,11 +146,11 @@ const Planet = (props: PlanetProps) => {
         }
       }
     }
-  }, [coordinates]);
+  }, [coordinates, followedPlanet, generalScale]);
 
   useEffect(() => {
     const movingElement: any = movingElementRef.current;
-    animateOrbit(movingElement, distance, speed / 3, initialAngle);
+    animateOrbit(movingElement, distance, speed, initialAngle);
   }, [props, newSpeed]);
 
   const animateOrbit = (
@@ -271,7 +284,9 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   position: absolute;
   width: ${(props) =>
     props.highContrast
-      ? props.radius - 5 + "px"
+      ? props.dimension
+        ? props.radius * 2 - 5 + "px"
+        : props.radius - 5 + "px"
       : props.sun
       ? props.radius * 1.5 + "px"
       : props.dimension
@@ -279,7 +294,9 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
       : props.radius + "px" || "100px"};
   height: ${(props) =>
     props.highContrast
-      ? props.radius - 5 + "px"
+      ? props.dimension
+        ? props.radius * 2 - 5 + "px"
+        : props.radius - 5 + "px"
       : props.sun
       ? props.radius * 1.5 + "px"
       : props.dimension
@@ -296,7 +313,10 @@ const InnerPlanet = styled.div<InnerPlanetProps>`
   border-radius: 50%;
   transition: all 0s ease, border 0.5s ease;
   border: ${(props) =>
-    (props.selected || props.highContrast) && props.radius && !props.followed
+    ((props.selected || props.highContrast) &&
+      props.radius &&
+      !props.followed) ||
+    props.highContrast
       ? "3px solid white"
       : ""};
   filter: ${(props) => (props.sun ? "blur(40px)" : "")};

@@ -5,44 +5,26 @@ import styled from "styled-components";
 //@ts-ignore
 import { HuePicker } from "react-color";
 import PlanetIcon from "../../assets/Icons/Planets.png";
-import ResetIcon from "../../assets/Icons/Reset.png";
 import OrbitsIcon from "../../assets/Icons/Orbits.png";
 import HighContrast from "../../assets/Icons/HighContrast.png";
 import Demo from "../../assets/Icons/Demo.png";
 import ResetView from "../../assets/Icons/ResetView.png";
 import FollowPlanet from "../../assets/Icons/Follow.png";
 import ThirdDimension from "../../assets/Icons/ThirdDimension.png";
-import FullScreen from "../../assets/Icons/FullScreen.png";
+import SecondDimension from "../../assets/Icons/SecondDimension.png";
+import FullScreenIcon from "../../assets/Icons/FullScreen.png";
+import NoFullScreenIcon from "../../assets/Icons/NoFullScreen.png";
+import Play from "../../assets/Icons/play-button.png";
+import Stop from "../../assets/Icons/stop-button.png";
 interface MenuDisplayed {
   open: boolean;
   idx?: number;
   planetList?: boolean;
   size?: string;
 }
-
-const buttons = {
-  generalMenu: [
-    { name: "Planets", icon: PlanetIcon, action: "showPlanets" },
-    { name: "Orbits", icon: OrbitsIcon, action: "showOrbits" },
-    {
-      name: "High contrast",
-      icon: HighContrast,
-      action: "highContrastMode",
-    },
-
-    { name: "Reset View", icon: ResetView, action: "resetView" },
-    { name: "Full screen", icon: FullScreen, action: "setFullScreen" },
-    { name: "thirdDimension", icon: ThirdDimension, action: "thirdDimension" },
-    { name: "cinematic", icon: ThirdDimension, action: "cinematic" },
-  ],
-  planetsMenuGeneral: [
-    { name: "Demo", icon: Demo, action: "showDemo" },
-    { name: "Reset", icon: ResetIcon, action: "resetPlanets" },
-  ],
-  planetsMenuSelection: [
-    { name: "Follow", icon: FollowPlanet, action: "followPlanet" },
-  ],
-};
+interface ButtonContainer {
+  name: string;
+}
 
 const Menu = () => {
   const {
@@ -57,19 +39,51 @@ const Menu = () => {
     resetMapState,
     showPlanetList,
     setShowPlanetList,
-    showPlanetInput,
-    setShowPlanetInput,
     handleFullScreen,
+    fullScreen,
     setThirdDimension,
     deselectPlanet,
     thirdDimension,
-    setAddSatellites,
     newSpeed,
     setSpeed,
-    mouseInactive,
-    setCinematic,
     cinematic,
+    setCinematic,
   } = useAppContext();
+
+  let buttons = {
+    generalMenu: [
+      { name: "Planets", icon: PlanetIcon, action: "showPlanets" },
+      { name: "Orbits", icon: OrbitsIcon, action: "showOrbits" },
+      {
+        name: "High contrast",
+        icon: HighContrast,
+        action: "highContrastMode",
+      },
+
+      { name: "Reset View", icon: ResetView, action: "resetView" },
+      { name: "Full screen", icon: FullScreenIcon, action: "setFullScreen" },
+      {
+        name: "3D/2D",
+        icon: ThirdDimension,
+        action: "thirdDimension",
+      },
+      {
+        name: "Cinematic Mode",
+        icon: cinematic ? Stop : Play,
+        action: "cinematic",
+      },
+    ],
+    planetsMenuGeneral: [{ name: "Demo", icon: Demo, action: "showDemo" }],
+    planetsMenuSelection: [
+      { name: "Follow", icon: FollowPlanet, action: "followPlanet" },
+    ],
+  };
+
+  const [allButtons] = useState(buttons);
+
+  const [openHorizontalMenu, setOpenHorizontalMenu] = useState(false);
+  const [menuButtons, setMenuButtons] = useState(allButtons.generalMenu);
+  const [openedMenu, setOpenedMenu] = useState("");
 
   const followPlanet = () => {
     if (followedPlanet) {
@@ -102,31 +116,20 @@ const Menu = () => {
         setThirdDimension(!thirdDimension);
         break;
       case "setFullScreen":
-        handleFullScreen();
+        handleFullScreen(!fullScreen);
         break;
       case "followPlanet":
         followPlanet();
         break;
-      case "newPlanet":
-        setShowPlanetInput(!showPlanetInput);
-        if (!showPlanetInput) setOpenedMenu("Inputs");
-        break;
-      case "newSatellite":
-        setAddSatellites(true);
-        setShowPlanetInput(!showPlanetInput);
-        if (!showPlanetInput) setOpenedMenu("Inputs");
-        break;
       case "cinematic":
         setCinematic(!cinematic);
+        if (!cinematic) setOpenHorizontalMenu(!openHorizontalMenu);
+        if (!cinematic) handleFullScreen(true);
         break;
       default:
         return;
     }
   };
-
-  const [openHorizontalMenu, setOpenHorizontalMenu] = useState(false);
-  const [menuButtons, setMenuButtons] = useState(buttons.generalMenu);
-  const [openedMenu, setOpenedMenu] = useState("");
 
   useEffect(() => {
     switch (openedMenu) {
@@ -134,12 +137,8 @@ const Menu = () => {
         // setOpenHorizontalMenu(false);
         // setShowPlanetList(false);
         break;
-      case "Planets":
-        setShowPlanetInput(false);
-        break;
       case "General":
         setShowPlanetList(false);
-        setShowPlanetInput(false);
         deselectPlanet("");
         break;
       default:
@@ -152,11 +151,8 @@ const Menu = () => {
       setOpenHorizontalMenu(false);
       setShowPlanetList(!showPlanetList);
       if (showPlanetList) deselectPlanet("");
-    } else if (showPlanetInput) {
-      setShowPlanetInput(!showPlanetInput);
-      setOpenHorizontalMenu(false);
     } else {
-      setMenuButtons(buttons.generalMenu);
+      setMenuButtons(allButtons.generalMenu);
       setOpenHorizontalMenu(!openHorizontalMenu);
       setOpenedMenu("General");
     }
@@ -164,20 +160,20 @@ const Menu = () => {
 
   useEffect(() => {
     if (showPlanetList && openHorizontalMenu) {
-      horizontalMenuHandler(buttons.planetsMenuGeneral, true);
+      horizontalMenuHandler(allButtons.planetsMenuGeneral, true);
     } else {
-      horizontalMenuHandler(buttons.generalMenu, false);
+      horizontalMenuHandler(allButtons.generalMenu, false);
     }
   }, [showPlanetList]);
 
   useEffect(() => {
     if (selectedPlanets.length === 1) {
-      horizontalMenuHandler(buttons.planetsMenuSelection, true);
+      horizontalMenuHandler(allButtons.planetsMenuSelection, true);
     } else if (selectedPlanets.length > 1) {
       // if (menuButtons != buttons.planetsMenuMultiSelection)
       //   horizontalMenuHandler(buttons.planetsMenuMultiSelection, true);
     } else if (showPlanetList) {
-      horizontalMenuHandler(buttons.planetsMenuGeneral, true);
+      horizontalMenuHandler(allButtons.planetsMenuGeneral, true);
     }
   }, [selectedPlanets]);
 
@@ -211,11 +207,10 @@ const Menu = () => {
         speed = 1;
         return;
     }
-    console.log(speed);
     setSpeed(speed);
   };
   return (
-    <div style={{ opacity: mouseInactive ? "0" : "1" }}>
+    <>
       <MenuContainer open={openHorizontalMenu}>
         <IconContainer
           onClick={() => handleMenuClick()}
@@ -228,22 +223,56 @@ const Menu = () => {
         </IconContainer>
       </MenuContainer>
       <MenuDisplayed open={openHorizontalMenu}>
-        {menuButtons.map((e, idx) => (
-          <MenuButtons
-            open={openHorizontalMenu}
-            idx={idx}
-            src={e.icon}
-            key={idx}
-            onClick={() => handleClick(e.action)}
-          />
-        ))}
+        {menuButtons.map((e, idx) => {
+          return e.name === "Cinematic Mode" ? (
+            <ButtonContainer key={idx + idx} name={e.name}>
+              <MenuButtons
+                open={openHorizontalMenu}
+                idx={idx}
+                src={cinematic ? Stop : Play}
+                key={idx}
+                onClick={() => handleClick(e.action)}
+              />
+            </ButtonContainer>
+          ) : e.name === "Full screen" ? (
+            <ButtonContainer key={idx + idx} name={e.name}>
+              <MenuButtons
+                open={openHorizontalMenu}
+                idx={idx}
+                src={fullScreen ? NoFullScreenIcon : FullScreenIcon}
+                key={idx}
+                onClick={() => handleClick(e.action)}
+              />
+            </ButtonContainer>
+          ) : e.name === "3D/2D" ? (
+            <ButtonContainer key={idx + idx} name={e.name}>
+              <MenuButtons
+                open={openHorizontalMenu}
+                idx={idx}
+                src={thirdDimension ? SecondDimension : ThirdDimension}
+                key={idx}
+                onClick={() => handleClick(e.action)}
+              />
+            </ButtonContainer>
+          ) : (
+            <ButtonContainer key={idx + idx} name={e.name}>
+              <MenuButtons
+                open={openHorizontalMenu}
+                idx={idx}
+                src={e.icon}
+                key={idx}
+                onClick={() => handleClick(e.action)}
+              />
+            </ButtonContainer>
+          );
+        })}
       </MenuDisplayed>
       <p style={{ color: "white" }}>x{newSpeed}</p>
       <button onClick={() => calcSpeed("less")}>-</button>
       <button onClick={() => calcSpeed("stop")}>stop</button>
       <button onClick={() => calcSpeed("normal")}>normal</button>
       <button onClick={() => calcSpeed("add")}>+</button>
-    </div>
+    </>
   );
 };
 
@@ -388,8 +417,36 @@ const MenuDisplayed = styled.div<MenuDisplayed>`
 
   @media (max-width: 768px) {
     height: 50px;
-    gap: 10px;
+    gap: 5px;
     padding: ${(props) => (props.open ? "0px 60px 0px 20px" : "0")};
+  }
+`;
+
+const ButtonContainer = styled.div<ButtonContainer>`
+  position: relative;
+  @media (min-width: 768px) {
+    &:after {
+      content: ${(props) => `"${props.name}"`};
+      color: white;
+      padding: 2px 5px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 5px;
+      position: absolute;
+      left: 50%;
+      bottom: -25px;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      white-space: nowrap;
+      opacity: 0;
+      transition: all 0.5s ease;
+      transition-delay: 0.5s;
+      font-size: 12px;
+    }
+    &:hover {
+      &:after {
+        opacity: 1;
+      }
+    }
   }
 `;
 
@@ -400,18 +457,6 @@ const MenuButtons = styled.img<MenuDisplayed>`
   transition: all 0.5 ease;
   cursor: pointer;
   z-index: 1000;
-
-  &:hover {
-    &:after {
-      content: "Test";
-      width: 100px;
-      background-color: red;
-      z-index: 1000px;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-  }
 
   @media (min-width: 768px) {
     &:hover {
@@ -425,7 +470,7 @@ const MenuButtons = styled.img<MenuDisplayed>`
       filter: invert(0);
       transition: filter 0.3s ease;
     }
-    width: 30px;
+    width: 40px;
     gap: 10px;
   }
 `;

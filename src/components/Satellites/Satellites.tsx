@@ -119,13 +119,17 @@ const SatelliteBody = styled.div<SatelliteCompProps>`
   position: absolute;
   width: ${(props) =>
     props.highContrast
-      ? props.radius - 5 + "px"
+      ? props.dimension
+        ? props.radius * 2 - 5 + "px"
+        : props.radius - 5 + "px"
       : props.dimension
       ? props.radius * 2 + "px"
       : props.radius + "px" || "100px"};
   height: ${(props) =>
     props.highContrast
-      ? props.radius - 5 + "px"
+      ? props.dimension
+        ? props.radius * 2 - 5 + "px"
+        : props.radius - 5 + "px"
       : props.dimension
       ? props.radius * 2 + "px"
       : props.radius + "px" || "100px"};
